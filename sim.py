@@ -29,7 +29,7 @@ def send_at_command(ser, command, delay=1):
         if response:
             print(f"Antwort: {response}")
         else:
-            print(f"⚠️ Keine Antwort auf Befehl: {command}")
+            print(f"Keine Antwort auf Befehl: {command}")
         return response
     except Exception as e:
         print(f"Fehler beim Senden des Befehls {command}: {e}")
