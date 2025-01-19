@@ -45,7 +45,7 @@ def main():
     try:
         # Teste die grundlegende Kommunikation mit dem Modul
         print("Überprüfe grundlegende Verbindung mit AT-Befehl...")
-        response = send_at_command(ser, "AT\r")
+        response = send_at_command(ser, "AT\n")
         if "OK" not in response:
             print("Modem antwortet nicht auf 'AT'. Bitte Verbindung prüfen.")
             return
