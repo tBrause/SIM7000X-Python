@@ -1,8 +1,11 @@
+#!/usr/bin/python
+
+import RPi.GPIO as GPIO
 import serial
 import time
 
 # Konfiguriere die serielle Schnittstelle
-SERIAL_PORT = "/dev/serial0"  # Ersetze mit deinem Port (z. B. /dev/ttyS0 oder COM3)
+SERIAL_PORT = "/dev/ttyS0"  # Ersetze mit deinem Port (z. B. /dev/ttyS0 oder COM3)
 BAUD_RATE = 9600
 TIMEOUT = 1
 
