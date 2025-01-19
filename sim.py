@@ -51,19 +51,19 @@ def main():
             return
 
         # 1. Status der SIM-Karte
-        print("\n1️ Status der SIM-Karte:")
+        print("\n 1️ Status der SIM-Karte:")
         send_at_command(ser, "AT+CPIN?")
 
         # 2. Ist die SIM-Karte eingelegt?
-        print("\n2️ Ist die SIM-Karte eingelegt?")
+        print("\n 2️ Ist die SIM-Karte eingelegt?")
         send_at_command(ser, "AT+CSMINS?")
 
         # 3. Aktuellen Netzbetreiber anzeigen
-        print("\n3️ Aktuellen Netzbetreiber anzeigen:")
+        print("\n 3️ Aktuellen Netzbetreiber anzeigen:")
         send_at_command(ser, "AT+COPS?")
 
         # 4. Signalqualität abfragen
-        print("\n4️ Signalqualität abfragen:")
+        print("\n 4️ Signalqualität abfragen:")
         send_at_command(ser, "AT+CSQ")
 
     finally:
