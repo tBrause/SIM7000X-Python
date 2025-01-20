@@ -48,5 +48,5 @@ try:
 	'''
 except :
     ser.close()
-    power_down(power_key)
+    power_down()
     GPIO.cleanup()
