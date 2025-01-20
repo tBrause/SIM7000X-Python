@@ -8,7 +8,7 @@ ser = serial.Serial("/dev/ttyS0",9600)
 ser.flushInput()
 
 power_key = 4
-command_input = 'AT'
+command_input = ''
 rec_buff = ''
 
 def power_on(power_key):
