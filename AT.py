@@ -12,7 +12,7 @@ command_input = ''
 rec_buff = ''
 
 def power_on(power_key):
-	print('SIM7600X is starting:')
+	print('GPIO power_key 4 SIM7000X is starting:')
 	GPIO.setmode(GPIO.BCM)
 	GPIO.setwarnings(False)
 	GPIO.setup(power_key,GPIO.OUT)
@@ -25,7 +25,7 @@ def power_on(power_key):
 	print('SIM7600X is ready')
 
 def power_down(power_key):
-	print('SIM7600X is loging off:')
+	print('GPIO power_key 4 SIM7000X is loging off:')
 	GPIO.output(power_key,GPIO.HIGH)
 	time.sleep(3)
 	GPIO.output(power_key,GPIO.LOW)
