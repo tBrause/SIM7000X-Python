@@ -34,7 +34,7 @@ def power_down(power_key):
 
 try:
     power_on(power_key)
-    '''
+
     while True:
       command_input = input('Please input the AT command:')
       ser.write((command_input+  '\r\n' ).encode())
@@ -45,8 +45,8 @@ try:
       if rec_buff != '':
             print(rec_buff.decode())
             rec_buff = ''
-	'''
+
 except :
     ser.close()
-    power_down()
+    power_down(power_key)
     GPIO.cleanup()
