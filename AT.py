@@ -22,7 +22,7 @@ def power_on(power_key):
 	GPIO.output(power_key,GPIO.LOW)
 	time.sleep(1)
 	ser.flushInput()
-	print('SIM7600X is ready')
+	print('GPIO power_key 4 SIM7000X is ready')
 
 def power_down(power_key):
 	print('GPIO power_key 4 SIM7000X is loging off:')
@@ -34,6 +34,7 @@ def power_down(power_key):
 
 try:
     power_on(power_key)
+    '''
     while True:
       command_input = input('Please input the AT command:')
       ser.write((command_input+  '\r\n' ).encode())
@@ -44,6 +45,7 @@ try:
       if rec_buff != '':
             print(rec_buff.decode())
             rec_buff = ''
+	'''
 except :
     ser.close()
     power_down(power_key)
