@@ -10,7 +10,7 @@ ser.flushInput()
 power_key = 6
 rec_buff = ''
 APN = 'internet'
-server_ip = 'linux.sanberlin.com'
+server_ip = 'sanberlin.com'
 Port = '80'
 
 def power_on(power_key):
