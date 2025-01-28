@@ -8,7 +8,7 @@ TIMEOUT = 1
 
 # MQTT-Broker Konfiguration
 BROKER = "mqtt.c2.energywan.de"
-PORT = "8083"
+PORT = "1883"
 CLIENT_ID = "SIM7000_MQTT_Client"
 TOPIC = "python/mqtt"
 MESSAGE = "Hello from SIM7000X!"
