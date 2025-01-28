@@ -22,7 +22,7 @@ def initialize_serial():
 # Sende einen AT-Befehl und lese die Antwort
 def send_at_command(ser, command, delay=1):
     try:
-        print(f"Sende Befehl: {command}")
+        #print(f"Sende Befehl: {command}")
         ser.write((command + "\r").encode())  # Sende den AT-Befehl mit Carriage Return
         time.sleep(delay)  # Warte auf die Antwort
         response = ser.read_all().decode().strip()  # Lies die Antwort
@@ -51,25 +51,25 @@ def main():
             return
 
         # 1. Status der SIM-Karte
-        print("\n Status der SIM-Karte:")
+        print("# Status der SIM-Karte:")
         send_at_command(ser, "AT+CPIN?")
 
         # 2. Ist die SIM-Karte eingelegt?
-        print("\n Ist die SIM-Karte eingelegt?")
+        print("# Ist die SIM-Karte eingelegt?")
         send_at_command(ser, "AT+CSMINS?")
 
         # 3. Aktuellen Netzbetreiber anzeigen
-        print("Aktuellen Netzbetreiber anzeigen:")
+        print("# Aktuellen Netzbetreiber anzeigen:")
         send_at_command(ser, "AT+COPS?")
 
         # 4. Signalqualität abfragen
-        print("Signalqualität abfragen:")
+        print("# Signalqualität abfragen:")
         send_at_command(ser, "AT+CSQ")
 
     finally:
         # Schließe die serielle Verbindung
         ser.close()
-        print("\nSerielle Verbindung geschlossen.")
+        print("# Serielle Verbindung geschlossen.")
 
 # Skript starten
 if __name__ == "__main__":
