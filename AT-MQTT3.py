@@ -36,6 +36,13 @@ try:
     print("APN konfigurieren...")
     response = send_at_command(ser, 'AT+CGDCONT=1,"IP","internet"', "OK", timeout=5)
     print("Antwort:", response)
+    
+    response = send_at_command(ser, "AT+CGACT=1,1", "OK", timeout=5)
+    print("Datenverbindung aktiviert:", response)
+    
+    response = send_at_command(ser, "AT+CIFSR", ".", timeout=5)
+    print("IP-Adresse:", response)
+
 
     # 2. MQTT-Parameter konfigurieren
     print("MQTT-Parameter konfigurieren...")
