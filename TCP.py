@@ -9,7 +9,7 @@ ser.flushInput()
 
 power_key = 6
 rec_buff = ''
-APN = 'internet'
+APN = 'o2 Internet'
 ServerIP = 'tbrause.duckdns.org'
 Port = '8443'
 Message = 'Waveshare'
