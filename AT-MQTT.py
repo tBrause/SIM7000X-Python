@@ -1,60 +1,29 @@
-#!/usr/bin/python
-
-# import RPi.GPIO as GPIO
 import serial
 import time
 
-# Konfiguriere die serielle Schnittstelle
-SERIAL_PORT = "/dev/serial0"
-BAUD_RATE = 9600
-TIMEOUT = 1
+def send_at_command(ser, command, timeout=1):
+    ser.write((command + '\r\n').encode())
+    time.sleep(timeout)
+    response = ser.read(ser.inWaiting()).decode()
+    print(f"Antwort: {command}\n{response}")
+    return response
 
-# Konfiguriere die Zugangsdaten für den MQTT-Broker
-MQTT_SERVER = "test.mosquitto.org"
-MQTT_PORT = 1883
-MQTT_TOPIC = "test"
-MQTT_MESSAGE = "Hello, MQTT!"
-
-# Initialisiere die serielle Verbindung
-def initialize_serial():
-    try:
-        ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=TIMEOUT)
-        print(f"Verbindung: {SERIAL_PORT}, {BAUD_RATE} Baud, Timeout: {TIMEOUT}s \n")
-        return ser
-    except Exception as e:
-        print(f"Fehler beim Öffnen der seriellen Verbindung: {e}")
-        return None
-
-# Sende einen AT-Befehl und lese die Antwort
-def send_at_command(ser, command, delay=1):
-    try:
-        #print(f"Sende Befehl: {command}")
-        ser.write((command + "\r").encode())  # Sende den AT-Befehl mit Carriage Return
-        time.sleep(delay)  # Warte auf die Antwort
-        response = ser.read_all().decode().strip()  # Lies die Antwort
-        if response:
-            print(f"Antwort: {response}")
-        else:
-            print(f"Keine Antwort auf Befehl: {command}")
-        return response
-    except Exception as e:
-        print(f"Fehler beim Senden des Befehls {command}: {e}")
-        return ""
-
-# Hauptfunktion für die Abfragen
 def main():
-    # Serielle Verbindung initialisieren
-    ser = initialize_serial()
-    if ser is None:
-        return  # Beende das Programm, wenn die serielle Verbindung nicht geöffnet werden kann
+    ser = serial.Serial("/dev/ttyS0", 9600)
+    ser.flushInput()
 
     try:
-        # Teste die grundlegende Kommunikation mit dem Modul
-        print("Teste die grundlegende Kommunikation mit dem Modul")
-        response = send_at_command(ser, "AT")
-        if "OK" not in response:
-            print("Modem antwortet nicht auf 'AT'. Bitte Verbindung prüfen.")
-            return
+        # Überprüfen der Firmware-Version
+        print("\n# Überprüfen der Firmware-Version:")
+        send_at_command(ser, "AT+CGMR")
+
+        # Überprüfen des Status der SIM-Karte
+        print("\n# Überprüfen des Status der SIM-Karte:")
+        send_at_command(ser, "AT+CPIN?")
+
+        # Überprüfen der Netzverbindung
+        print("\n# Überprüfen der Netzverbindung:")
+        send_at_command(ser, "AT+CREG?")
 
         # 1. Status der SIM-Karte
         print("\n# Status der SIM-Karte:")
@@ -62,7 +31,7 @@ def main():
 
         # 2. Aktiviere MQTT
         print("\n# Aktiviere MQTT")
-        send_at_command(ser, f"AT+CMQTTSTART")
+        send_at_command(ser, "AT+CMQTTSTART")
         send_at_command(ser, f"AT+CMQTTACCQ=0,0,\"{MQTT_SERVER}\"")
         send_at_command(ser, f"AT+CMQTTCONNECT=0,\"tcp://{MQTT_SERVER}:{MQTT_PORT}\",60,1")
         send_at_command(ser, f"AT+CMQTTSUB=0,1,\"{MQTT_TOPIC}\",1")
