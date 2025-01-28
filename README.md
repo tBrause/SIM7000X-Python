@@ -24,7 +24,7 @@ python PORT.py
 
 - BAUDRATE.py
 
-### AT-SIM.py
+### SIM-Karte
 
 > Verschiedne Test und Informationen über die SIM-Karte.
 
