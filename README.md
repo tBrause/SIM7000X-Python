@@ -1,14 +1,6 @@
 # SIM7000X-Python
 
-## Tests
-
-### Finde serielle Ports und Baudraten für SIM7000X
-
-> Findet alle seriellen Ports und Baudraten, die für den SIM7000X geeignet sind.
-
-```
-python AT-BAUDRATE.py
-```
+## Allgemeine Tests
 
 ### Serieller Port
 
@@ -18,11 +10,21 @@ python AT-BAUDRATE.py
 python PORT.py
 ```
 
+### Finde serielle Ports und Baudraten für SIM7000X
+
+> Findet alle seriellen Ports und Baudraten, die für den SIM7000X geeignet sind.
+
+```
+python AT-BAUDRATE.py
+```
+
 ### Serieller Port mit Baudrate 9600
 
 > Prüft, ob der serielle Port frei ist und ob die Baudrate 9600 funktioniert.
 
 - BAUDRATE.py
+
+## Spezifische Tests
 
 ### SIM-Karte
 
