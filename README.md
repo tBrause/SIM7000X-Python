@@ -22,13 +22,15 @@ python AT-BAUDRATE.py
 
 > Prüft, ob der serielle Port frei ist und ob die Baudrate 9600 funktioniert.
 
-- BAUDRATE.py
+```
+BAUDRATE.py
+```
 
 ## Spezifische Tests
 
 ### SIM-Karte
 
-> Verschiedne Test und Informationen über die SIM-Karte.
+> Verschiedene Test und Informationen über die SIM-Karte.
 
 ```
 python AT-SIM.py
