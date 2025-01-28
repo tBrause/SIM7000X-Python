@@ -40,8 +40,10 @@ try:
     response = send_at_command(ser, "AT+CGACT=1,1", "OK", timeout=5)
     print("Datenverbindung aktiviert:", response)
     
+    """
     response = send_at_command(ser, "AT+CIFSR", ".", timeout=5)
     print("IP-Adresse:", response)
+    """
 
 
     # 2. MQTT-Parameter konfigurieren
