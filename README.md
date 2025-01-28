@@ -8,8 +8,8 @@
 
 - PORT.py
 
-### Serieller Port mit Baudrate
+### Serieller Port mit Baudrate 9600
 
-> Prüft, ob der serielle Port frei ist und ob die Baudrate funktioniert.
+> Prüft, ob der serielle Port frei ist und ob die Baudrate 9600 funktioniert.
 
 - BAUDRATE.py
