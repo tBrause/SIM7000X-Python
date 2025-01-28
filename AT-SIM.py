@@ -65,6 +65,10 @@ def main():
         # 4. Signalqualität abfragen
         print("# Signalqualität abfragen:")
         send_at_command(ser, "AT+CSQ")
+        
+        # 5. APN-Einstellungen abfragen
+        print("# APN-Einstellungen abfragen:")
+        send_at_command(ser, "AT+CGDCONT?")
 
     finally:
         # Schließe die serielle Verbindung
