@@ -4,7 +4,7 @@ import RPi.GPIO as GPIO
 import serial
 import time
 
-ser = serial.Serial('/dev/ttyS0',115200)
+ser = serial.Serial('/dev/serial0',9600)
 ser.flushInput()
 
 power_key = 6
