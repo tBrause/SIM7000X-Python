@@ -53,11 +53,17 @@ try:
     print("Antwort:", response)
 
     # Optional: Benutzername und Passwort, falls benötigt
+    """
     response = send_at_command(ser, 'AT+SMCONF="USERNAME","your_username"', "OK", timeout=5)
     print("Antwort:", response)
     response = send_at_command(ser, 'AT+SMCONF="PASSWORD","your_password"', "OK", timeout=5)
     print("Antwort:", response)
-
+    
+    response = send_at_command(ser, 'AT+SMCONF="USERNAME","your_username"', "OK", timeout=5)
+    print("Antwort:", response)
+    response = send_at_command(ser, 'AT+SMCONF="PASSWORD","your_password"', "OK", timeout=5)
+    print("Antwort:", response)
+    """
     # 3. MQTT-Verbindung herstellen
     print("MQTT-Verbindung herstellen...")
     response = send_at_command(ser, "AT+SMCONN", "OK", timeout=10)
