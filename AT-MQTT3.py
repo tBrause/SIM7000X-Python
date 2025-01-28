@@ -22,6 +22,11 @@ ser = serial.Serial(serial_port, baud_rate, timeout=1)
 print(f"Serielle Verbindung geöffnet: {serial_port} mit Baudrate {baud_rate}")
 
 try:
+    # AT+SMSTATE? - Status des MQTT-Dienstes abfragen
+    print("Status des MQTT-Dienstes abfragen...")
+    response = send_at_command(ser, "AT+SMSTATE?", "STATE: 0", timeout=5)
+    print("Antwort:", response)
+    
     # 1. APN konfigurieren
     print("APN konfigurieren...")
     response = send_at_command(ser, 'AT+CGDCONT=1,"IP","internet"', "OK", timeout=5)
