@@ -69,6 +69,10 @@ def main():
         # 5. APN-Einstellungen abfragen
         print("# APN-Einstellungen abfragen:")
         send_at_command(ser, "AT+CGDCONT?")
+        
+        # 6. IP-Adresse abfragen
+        print("# IP-Adresse abfragen:")
+        send_at_command(ser, "AT+CGPADDR")
 
     finally:
         # Schließe die serielle Verbindung
