@@ -59,11 +59,11 @@ def main():
         send_at_command(ser, "AT+CSMINS?")
 
         # 3. Aktuellen Netzbetreiber anzeigen
-        print("\n Aktuellen Netzbetreiber anzeigen:")
+        print("Aktuellen Netzbetreiber anzeigen:")
         send_at_command(ser, "AT+COPS?")
 
         # 4. Signalqualität abfragen
-        print("\n Signalqualität abfragen:")
+        print("Signalqualität abfragen:")
         send_at_command(ser, "AT+CSQ")
 
     finally:
