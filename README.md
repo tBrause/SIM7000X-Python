@@ -23,3 +23,11 @@ python PORT.py
 > Prüft, ob der serielle Port frei ist und ob die Baudrate 9600 funktioniert.
 
 - BAUDRATE.py
+
+### AT-SIM.py
+
+> Verschiedne Test und Informationen über die SIM-Karte.
+
+```
+python AT-SIM.py
+```
