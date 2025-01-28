@@ -10,8 +10,8 @@ ser.flushInput()
 power_key = 6
 rec_buff = ''
 APN = 'internet'
-ServerIP = 'tbrause.duckdns.org'
-Port = '8443'
+server_ip = 'mqtt.c2.energywan.de'
+Port = '8083'
 Message = 'Waveshare'
 
 def power_on(power_key):
@@ -53,30 +53,53 @@ def send_at(command,back,timeout):
 	else:
 		print(command + ' no responce')
 
-try:
-	power_on(power_key)
-	send_at('AT+CSQ','OK',1)
-	send_at('AT+CREG?','+CREG: 0,1',1)
-	send_at('AT+CPSI?','OK',1)
-	send_at('AT+CGREG?','+CGREG: 0,1',0.5)
-	send_at('AT+CGSOCKCONT=1,\"IP\",\"'+APN+'\"','OK',1)
-	send_at('AT+CSOCKSETPN=1', 'OK', 1)
-	send_at('AT+CIPMODE=0', 'OK', 1)
-	send_at('AT+NETOPEN', '+NETOPEN: 0',5)
-	send_at('AT+IPADDR', '+IPADDR:', 1)
-	send_at('AT+CIPOPEN=0,\"TCP\",\"'+ServerIP+'\",'+Port,'+CIPOPEN: 0,0', 5)
-	send_at('AT+CIPSEND=0,', '>', 2)#If not sure the message number,write the command like this: AT+CIPSEND=0, (end with 1A(hex))
-	ser.write(Message.encode())
-	if 1 == send_at(b'\x1a'.decode(),'OK',5):
-		print('send message successfully!')
-	send_at('AT+CIPCLOSE=0','+CIPCLOSE: 0,0',15)
-	send_at('AT+NETCLOSE', '+NETCLOSE: 0', 1)
-	power_down(power_key)
-except:
-	if ser != None:
-		ser.close()
-		GPIO.cleanup()
+def send_tcp_message():
+    try:
+        power_on(power_key)
 
-if ser != None:
-		ser.close()
-		GPIO.cleanup()
+        # Setze den APN
+        ser.write(('AT+CGDCONT=1,"IP","' + APN + '"\r\n').encode())
+        time.sleep(1)
+        if ser.inWaiting():
+            rec_buff = ser.read(ser.inWaiting())
+            print(rec_buff.decode())
+
+        # Starte die PDP-Kontextaktivierung
+        ser.write('AT+CGACT=1,1\r\n'.encode())
+        time.sleep(1)
+        if ser.inWaiting():
+            rec_buff = ser.read(ser.inWaiting())
+            print(rec_buff.decode())
+
+        # Öffne eine TCP-Verbindung
+        ser.write(('AT+CIPSTART="TCP","' + server_ip + '",' + Port + '\r\n').encode())
+        time.sleep(2)
+        if ser.inWaiting():
+            rec_buff = ser.read(ser.inWaiting())
+            print(rec_buff.decode())
+
+        # Sende die Nachricht
+        ser.write(('AT+CIPSEND\r\n').encode())
+        time.sleep(1)
+        ser.write((Message + '\r\n').encode())
+        time.sleep(1)
+        ser.write((chr(26)).encode())  # Ctrl+Z zum Beenden der Nachricht
+        time.sleep(1)
+        if ser.inWaiting():
+            rec_buff = ser.read(ser.inWaiting())
+            print(rec_buff.decode())
+
+        # Schließe die TCP-Verbindung
+        ser.write('AT+CIPCLOSE\r\n'.encode())
+        time.sleep(1)
+        if ser.inWaiting():
+            rec_buff = ser.read(ser.inWaiting())
+            print(rec_buff.decode())
+
+    finally:
+        ser.close()
+        GPIO.cleanup()
+        print('Good bye')
+
+if __name__ == "__main__":
+    send_tcp_message()
