@@ -78,24 +78,6 @@ def send_tcp_message():
             rec_buff = ser.read(ser.inWaiting())
             print(rec_buff.decode())
 
-        # Sende die Nachricht
-        ser.write(('AT+CIPSEND\r\n').encode())
-        time.sleep(1)
-        ser.write((Message + '\r\n').encode())
-        time.sleep(1)
-        ser.write((chr(26)).encode())  # Ctrl+Z zum Beenden der Nachricht
-        time.sleep(1)
-        if ser.inWaiting():
-            rec_buff = ser.read(ser.inWaiting())
-            print(rec_buff.decode())
-
-        # Schließe die TCP-Verbindung
-        ser.write('AT+CIPCLOSE\r\n'.encode())
-        time.sleep(1)
-        if ser.inWaiting():
-            rec_buff = ser.read(ser.inWaiting())
-            print(rec_buff.decode())
-
     finally:
         ser.close()
         GPIO.cleanup()
