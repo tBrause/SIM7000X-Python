@@ -10,8 +10,8 @@ ser.flushInput()
 power_key = 6
 rec_buff = ''
 APN = 'internet'
-server_ip = 'mqtt.c2.energywan.de'
-Port = '8083'
+server_ip = 'linux.sanberlin.com'
+Port = '80'
 Message = 'Waveshare'
 
 def power_on(power_key):
