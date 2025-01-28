@@ -35,3 +35,11 @@ python BAUDRATE.py
 ```
 python AT-SIM.py
 ```
+
+### TCP Verbindung
+
+> Testet die TCP-Verbindung.
+
+```
+python AT-TCP.py
+```
