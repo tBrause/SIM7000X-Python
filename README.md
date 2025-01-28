@@ -2,11 +2,21 @@
 
 ## Tests
 
+### Finde serielle Ports und Baudraten für SIM7000X
+
+> Findet alle seriellen Ports und Baudraten, die für den SIM7000X geeignet sind.
+
+```
+python AT-BAUDRATE.py
+```
+
 ### Serieller Port
 
 > Prüft, ob der serielle Port bereits belegt ist.
 
-- PORT.py
+```
+python PORT.py
+```
 
 ### Serieller Port mit Baudrate 9600
 
