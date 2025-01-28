@@ -13,7 +13,7 @@ TIMEOUT = 1
 def initialize_serial():
     try:
         ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=TIMEOUT)
-        print(f"Serielle Verbindung geöffnet: {SERIAL_PORT}")
+        print(f"Verbindung: {SERIAL_PORT}, {BAUD_RATE} Baud, Timeout: {TIMEOUT}s")
         return ser
     except Exception as e:
         print(f"Fehler beim Öffnen der seriellen Verbindung: {e}")
@@ -55,21 +55,21 @@ def main():
         send_at_command(ser, "AT+CPIN?")
 
         # 2. Ist die SIM-Karte eingelegt?
-        print("\r # Ist die SIM-Karte eingelegt?")
+        print("\n\n # Ist die SIM-Karte eingelegt?")
         send_at_command(ser, "AT+CSMINS?")
 
         # 3. Aktuellen Netzbetreiber anzeigen
-        print("# Aktuellen Netzbetreiber anzeigen:")
+        print("\n\n # Aktuellen Netzbetreiber anzeigen:")
         send_at_command(ser, "AT+COPS?")
 
         # 4. Signalqualität abfragen
-        print("# Signalqualität abfragen:")
+        print("\n\n # Signalqualität abfragen:")
         send_at_command(ser, "AT+CSQ")
 
     finally:
         # Schließe die serielle Verbindung
         ser.close()
-        print("# Serielle Verbindung geschlossen.")
+        print("\n\n # Serielle Verbindung geschlossen.")
 
 # Skript starten
 if __name__ == "__main__":
