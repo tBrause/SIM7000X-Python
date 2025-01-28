@@ -62,7 +62,7 @@ def main():
 
         # 2. Aktiviere MQTT
         print("\n# Aktiviere MQTT")
-        send_at_command(ser, f"AT+CGDCONT=1,'IP','internet'")
+        send_at_command(ser, f"AT+CGDCONT=1,'mqtt.c2.energywan.de','internet'")
         send_at_command(ser, f"AT+CGATT=1")
         send_at_command(ser, f"AT+CMQTTACCQ=0,'client_id'")
         #send_at_command(ser, f"AT+SMCONF=?")
