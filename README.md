@@ -23,7 +23,7 @@ python AT-BAUDRATE.py
 > Prüft, ob der serielle Port frei ist und ob die Baudrate 9600 funktioniert.
 
 ```
-BAUDRATE.py
+python BAUDRATE.py
 ```
 
 ## Spezifische Tests
