@@ -36,6 +36,9 @@ def setup_mqtt(ser):
     response = send_at_command(ser, 'AT+CGDCONT=1,"IP","internet"', "OK", timeout=5)
     print("Antwort:", response)
     
+    response = send_at_command(ser, "AT+CMQTTSTATUS?", "OK", timeout=5)
+    print("MQTT-Status:", response)
+    
     # 1. MQTT konfigurieren
     print("1. MQTT konfigurieren...")
     response = send_at_command(ser, f'AT+CMQTTSTART', "OK", timeout=5)
