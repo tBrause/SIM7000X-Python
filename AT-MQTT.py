@@ -63,12 +63,12 @@ def main():
         # 2. Aktiviere MQTT
         print("\n# Aktiviere MQTT")
         send_at_command(ser, f"AT+CMQTTSTART")
-        send_at_command(ser, f"AT+CMQTTACCQ=0,\"{MQTT_SERVER}\"")
-        send_at_command(ser, f"AT+CMQTTCID=0,1")
-        send_at_command(ser, f"AT+CMQTTCONNECT=0,\"{MQTT_SERVER}\",{MQTT_PORT}")
+        send_at_command(ser, f"AT+CMQTTACCQ=0,0,\"{MQTT_SERVER}\"")
+        send_at_command(ser, f"AT+CMQTTCONNECT=0,\"tcp://{MQTT_SERVER}:{MQTT_PORT}\",60,1")
         send_at_command(ser, f"AT+CMQTTSUB=0,1,\"{MQTT_TOPIC}\",1")
-        send_at_command(ser, f"AT+CMQTTTOPIC=0,1,\"{MQTT_TOPIC}\"")
-        send_at_command(ser, f"AT+CMQTTPAYLOAD=0,1,\"{MQTT_MESSAGE}\"")
+        send_at_command(ser, f"AT+CMQTTTOPIC=0,0,\"{MQTT_TOPIC}\"")
+        send_at_command(ser, f"AT+CMQTTPAYLOAD=0,0,\"{MQTT_MESSAGE}\"")
+        send_at_command(ser, f"AT+CMQTTPUB=0,1,60")
         
     finally:
         # Schließe die serielle Verbindung
