@@ -12,7 +12,6 @@ rec_buff = ''
 APN = 'internet'
 server_ip = 'linux.sanberlin.com'
 Port = '80'
-Message = 'Waveshare'
 
 def power_on(power_key):
 	print('SIM7600X is starting:')
