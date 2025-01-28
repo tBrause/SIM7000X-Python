@@ -14,7 +14,7 @@ server_ip = 'linux.sanberlin.com'
 Port = '80'
 
 def power_on(power_key):
-	print('SIM7600X is starting:')
+	print('SIM7000X is starting')
 	GPIO.setmode(GPIO.BCM)
 	GPIO.setwarnings(False)
 	GPIO.setup(power_key,GPIO.OUT)
@@ -24,15 +24,15 @@ def power_on(power_key):
 	GPIO.output(power_key,GPIO.LOW)
 	time.sleep(2)
 	ser.flushInput()
-	print('SIM7600X is ready')
+	print('SIM7000X is ready')
 
 def power_down(power_key):
-	print('SIM7600X is loging off:')
+	print('SIM7000X is loging off')
 	GPIO.output(power_key,GPIO.HIGH)
 	time.sleep(3)
 	GPIO.output(power_key,GPIO.LOW)
 	time.sleep(2)
-	print('Good bye')
+	print('Good bye\n')
 	
 def send_at(command,back,timeout):
 	rec_buff = ''
