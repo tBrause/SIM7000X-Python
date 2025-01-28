@@ -32,6 +32,9 @@ def setup_mqtt(ser):
     """
     Einrichtung der MQTT-Verbindung mit dem SIM7000-Modul.
     """
+    
+    send_at_command(ser, f'AT+CGDCONT=1', "IP", "internet")
+    
     # 1. MQTT konfigurieren
     print("1. MQTT konfigurieren...")
     response = send_at_command(ser, f'AT+CMQTTSTART', "OK", timeout=5)
