@@ -63,6 +63,9 @@ def main():
         # 2. Aktiviere MQTT
         print("\n# Aktiviere MQTT")
         send_at_command(ser, f"AT+SMCONF=?")
+        # AT+SMCONF? READ
+        send_at_command(ser, f"AT+SMCONF=0,1")
+        # AT+SMCONF=<n>[,<m>] WRITE
         #send_at_command(ser, f"AT+CMQTTSTART")
         #send_at_command(ser, f"AT+SMCONN")
         #send_at_command(ser, f"AT+CMQTTACCQ=0,0,\"{MQTT_SERVER}\"")
