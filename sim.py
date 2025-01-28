@@ -13,7 +13,7 @@ TIMEOUT = 1
 def initialize_serial():
     try:
         ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=TIMEOUT)
-        print(f"Verbindung: {SERIAL_PORT}, {BAUD_RATE} Baud, Timeout: {TIMEOUT}s")
+        print(f"Verbindung: {SERIAL_PORT}, {BAUD_RATE} Baud, Timeout: {TIMEOUT}s \n")
         return ser
     except Exception as e:
         print(f"Fehler beim Öffnen der seriellen Verbindung: {e}")
