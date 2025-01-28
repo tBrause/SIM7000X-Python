@@ -9,7 +9,7 @@ ser.flushInput()
 
 power_key = 6
 rec_buff = ''
-APN = 'CMNET'
+APN = 'internet'
 ServerIP = '118.190.93.84'
 Port = '2317'
 Message = 'Waveshare'
