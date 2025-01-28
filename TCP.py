@@ -80,7 +80,7 @@ def send_tcp_message():
     finally:
         ser.close()
         GPIO.cleanup()
-        print('Good bye')
+        print('Good bye\n')
 
 if __name__ == "__main__":
     send_tcp_message()
