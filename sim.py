@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 import serial
 import time
 
