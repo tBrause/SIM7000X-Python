@@ -10,8 +10,8 @@ ser.flushInput()
 power_key = 6
 rec_buff = ''
 APN = 'internet'
-ServerIP = '118.190.93.84'
-Port = '2317'
+ServerIP = 'tbrause.duckdns.org'
+Port = '8443'
 Message = 'Waveshare'
 
 def power_on(power_key):
