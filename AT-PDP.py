@@ -19,7 +19,7 @@ def initialize_serial():
         return None
 
 # Sende einen AT-Befehl und lese die Antwort
-def send_at_command(ser, command, delay=1):
+def send_at_command(ser, command, delay=3):
     try:
         #print(f"Sende Befehl: {command}")
         ser.write((command + "\r").encode())  # Sende den AT-Befehl mit Carriage Return
@@ -46,27 +46,31 @@ def main():
 
         
         # List of supported responses
-        response = send_at_command(ser, "AT+CGACT=?", delay=1)
+        response = send_at_command(ser, "AT+CGACT=?", delay=3)
         print("List of supported responses:", response)
         
         # Check the status of the profiles (CGACT)
-        response = send_at_command(ser, "AT+CGACT?", delay=1)
+        response = send_at_command(ser, "AT+CGACT?", delay=3)
         print("Status of the profiles (CGACT):", response)
         
         # Activate PDP profile 3
-        response = send_at_command(ser, "AT+CGACT=1,1", delay=1)
+        response = send_at_command(ser, "AT+CGACT=1,1", delay=3)
         print("Activate PDP profile 3:", response)
         
         # AT+CNACT=1,"cmnet"
-        response = send_at_command(ser, 'AT+CNACT=1,"internet"', delay=1)
+        response = send_at_command(ser, 'AT+CNACT=1,"internet"', delay=3)
         print("Wireless connection:", response)
         
+        # AT+CNACT? IP address
+        response = send_at_command(ser, "AT+CNACT?", delay=3)
+        print("Local IP address:", response)
+        
         # Deactivate profile 3
-        response = send_at_command(ser, "AT+CGACT=0,1", delay=1)
+        response = send_at_command(ser, "AT+CGACT=0,1", delay=3)
         print("Deactivate profile 3:", response)
         
         # Check status of PDP profiles
-        response = send_at_command(ser, "AT+CGACT?", delay=1)
+        response = send_at_command(ser, "AT+CGACT?", delay=3)
         print("Status of the profiles (CGACT):", response)
 
         
