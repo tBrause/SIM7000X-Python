@@ -22,8 +22,6 @@ print(f"Serielle Verbindung geöffnet: {serial_port} mit Baudrate {baud_rate}")
 
 try:
     
-    response = send_at_command(ser, 'AT+CIPPING="8.8.8.8",1,16,5000,64', "OK", timeout=10)
-    print("PING Test:", response)
 
 
     # Netzwerkregistrierung überprüfen
@@ -46,6 +44,9 @@ try:
     if "OK" not in response:
         print("Fehler: Datenverbindung konnte nicht aktiviert werden.")
         exit()
+
+    response = send_at_command(ser, 'AT+CIPPING="8.8.8.8",1,16,5000,64', "OK", timeout=10)
+    print("PING Test:", response)
 
     # MQTT-Parameter konfigurieren
     print("MQTT-Parameter konfigurieren...")
