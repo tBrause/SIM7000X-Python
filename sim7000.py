@@ -140,7 +140,7 @@ if sys.argv[1] == "mqtt-nossl":
     print("++++++++++++++++++++ MQTT - NO SSL +++++++++++++++++++++\n")
     AT("+CNACT=1") # Open wireless connection
     AT("+CNACT?") # Check connection open and have IP
-    AT('+SMCONF="CLIENTID",1233')
+    AT('+SMCONF="CLIENTID",SIM7000X_Client_1234')
     AT('+SMCONF="KEEPTIME",60') # Set the MQTT connection time (timeout?)
     AT('+SMCONF="CLEANSS",1')
     AT('+SMCONF="URL","emqx.c2.energywan.de","1883"'.format(MQTT_URL)) # Set MQTT address
