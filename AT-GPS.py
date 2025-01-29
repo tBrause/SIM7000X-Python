@@ -22,6 +22,11 @@ def main():
     response = send_at_command('AT+CGNSINF', ser)
     print("GNSS information response:", response)
     
+    # End GNSS session
+    response = send_at_command('AT+CGNSPWR=0', ser)
+    print("End GNSS session response:", response)
+    
+    
     # Close serial port
     ser.close()
 
