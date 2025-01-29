@@ -42,71 +42,17 @@ def main():
         return  # Beende das Programm, wenn die serielle Verbindung nicht geöffnet werden kann
 
     try:
-      """
-      //List of supported responses
+        # Serielle Verbindung öffnen
+        ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=5)
+        print(f"Serielle Verbindung geöffnet: {SERIAL_PORT} mit Baudrate {BAUD_RATE}")
 
-AT+CGACT=?
-
- 
-
-//Wait for 1 second
-
-WAIT=0
-
- 
-
-//Check the status of the profiles
-
-AT+CGACT?
-
- 
-
-//Wait for 1 second
-
-WAIT=1
-
- 
-
-//Activate PDP profile 3
-
-AT+CGACT=1,3
-
- 
-
-//Wait for 4 seconds
-
-WAIT=4
-
- 
-
-//Check status of PDP profiles
-
-AT+CGACT?
-
- 
-
-//Wait for 1 second
-
-WAIT=1
-
- 
-
-//Deactivate profile 3
-
-AT+CGACT=0,3
-
- 
-
-//Wait for 3 seconds
-
-WAIT=3
-
- 
-
-//Check status of PDP profiles
-
-AT+CGACT?
-"""
+        
+        # List of supported responses
+        response = send_at_command(ser, "AT")
+        print("Antwort:", response)
+        
+    except Exception as e:
+        print(f"Fehler bei der Verarbeitung: {e}")
     finally:
         # Schließe die serielle Verbindung
         ser.close()
