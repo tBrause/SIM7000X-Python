@@ -83,57 +83,6 @@ AT('+CGNAPN')
 APN = cgcontrdp[1][0].split(",")[2]
 IP = cgcontrdp[1][0].split(",")[3]
 
-############################### PING/NTP ##################################
-
-# Ping - works :-)
-if sys.argv[1] == "ping":
-    print("++++++++++++++++++++ PING +++++++++++++++++++++\n")
-    cstt = AT('+CSTT?')
-    if APN not in cstt[1][0]:
-        AT('+CSTT="{}"'.format(APN))
-        AT('+CIICR')
-    AT('+CIFSR', success=IP)
-    AT('+CIPPING="www.google.com.au"')
-
-# Get NTP time - working :-)
-if sys.argv[1] == "ntp":
-    print("++++++++++++++++++++ NTP +++++++++++++++++++++\n")
-    AT('+SAPBR=3,1,"APN","{}"'.format(APN))
-    AT('+SAPBR=1,1')
-    AT('+SAPBR=2,1')
-    AT('+CNTP="pool.ntp.org",0,1,1')
-    AT('+CNTP', timeout=3, success="+CNTP")
-    AT('+SAPBR=0,1')
-
-############################### HTTP/MQTT ##################################
-
-# HTTP Get example - working :-)
-if sys.argv[1] == "http1":
-    print("++++++++++++++++++++ HTTP1 +++++++++++++++++++++\n")
-    AT('+SAPBR=3,1,"APN","{}"'.format(APN))
-    AT('+SAPBR=1,1')
-    AT('+SAPBR=2,1')
-    AT('+HTTPINIT')
-    AT('+HTTPPARA="CID",1')
-    AT('+HTTPPARA="URL","http://minimi.ukfit.webfactional.com"')
-    AT('+HTTPACTION=0', timeout=30, success="+HTTPACTION: 0,200")
-    AT('+HTTPREAD')
-    AT('+HTTPTERM')
-    AT('+SAPBR=0,1')
-
-# HTTP Get example - Working :-)
-if sys.argv[1] == "http2":
-    print("++++++++++++++++++++ HTTP2 +++++++++++++++++++++\n")
-    AT('+CNACT=1')
-    AT("+CNACT?")
-    AT('+SHCONF="URL","http://minimi.ukfit.webfactional.com"')
-    AT('+SHCONF="BODYLEN",350')
-    AT('+SHCONF="HEADERLEN",350')
-    AT('+SHCONN',timeout=30, success="OK")
-    AT('+SHSTATE?')
-    AT('+SHREQ="http://minimi.ukfit.webfactional.com",1', timeout=30, success="+SHREQ:")
-    AT('+SHREAD=0,1199', timeout=30, success="</html>")
-    AT('+SHDISC')
 
 # MQTT (No SSL) - Working :-)
 if sys.argv[1] == "mqtt-nossl":
@@ -155,43 +104,6 @@ if sys.argv[1] == "mqtt-nossl":
     AT('+SMDISC') # Disconnect MQTT
     AT("+CNACT=0") # Close wireless connection
 
-############################### SSL/TLS ##################################
-
-# Check certs on device - working :-)
-if sys.argv[1] == "certs-check":
-    print("++++++++++++++++++++ CERTS - CHECK +++++++++++++++++++++\n")
-    AT('+CFSINIT')
-    AT('+CFSGFIS=3,"{}"'.format(CA_NAME))
-    AT('+CFSGFIS=3,"{}"'.format(CERT_NAME))
-    AT('+CFSGFIS=3,"{}"'.format(KEY_NAME))
-    AT('+CFSTERM')
-
-# Delete certs on device - working :-)
-if sys.argv[1] == "certs-delete":
-    print("++++++++++++++++++++ CERTS - DELETE +++++++++++++++++++++\n")
-    AT('+CFSINIT')
-    AT('+CFSDFILE=3,"{}"'.format(CA_NAME))
-    AT('+CFSDFILE=3,"{}"'.format(CERT_NAME))
-    AT('+CFSDFILE=3,"{}"'.format(KEY_NAME))
-    AT('+CFSTERM')
-
-# Load a cert from a file on computer - working :-)
-if sys.argv[1] == "certs-load":
-    print("++++++++++++++++++++ CERTS - LOAD +++++++++++++++++++++\n")
-    AT('+CFSINIT')
-    with open(os.path.join(CERTS_FOLDER, CA_NAME),'rb') as f:
-        data = f.read()
-        AT('+CFSWFILE=3,"{}",0,{},5000'.format(CA_NAME, len(data)), success="DOWNLOAD")
-        send(data)
-    with open(os.path.join(CERTS_FOLDER, CERT_NAME),'rb') as f:
-        data = f.read()
-        AT('+CFSWFILE=3,"{}",0,{},5000'.format(CERT_NAME, len(data)), success="DOWNLOAD")
-        send(data)
-    with open(os.path.join(CERTS_FOLDER, KEY_NAME),'rb') as f:
-        data = f.read()
-        AT('+CFSWFILE=3,"{}",0,{},5000'.format(KEY_NAME, len(data)), success="DOWNLOAD")
-        send(data)
-    AT('+CFSTERM')
 
 # MQTT (SSL) - No client cert, working for Mosquitto.org :-(
 if sys.argv[1] == "mqtt-cacert":
