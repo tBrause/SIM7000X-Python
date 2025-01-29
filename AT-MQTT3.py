@@ -53,7 +53,7 @@ try:
 
     # Open wireless connection
     print("Open wireless connection...")
-    response = send_at_command(ser, "AT+CNACT=1, 'internet'", "OK", timeout=5)
+    response = send_at_command(ser, 'AT+CNACT=1,"internet"', "OK", timeout=5)
     print("Wireless connection:", response)
     
     # local IP / AT+CNACT?
