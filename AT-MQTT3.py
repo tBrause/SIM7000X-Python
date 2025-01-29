@@ -20,19 +20,7 @@ baud_rate = 9600
 ser = serial.Serial(serial_port, baud_rate, timeout=1)
 print(f"Serielle Verbindung geöffnet: {serial_port} mit Baudrate {baud_rate}")
 
-try:
-    
-    # Open wireless connection
-    print("Open wireless connection...")
-    response = send_at_command(ser, "AT+CNACT=1, 'internet'", "OK", timeout=5)
-    print("Wireless connection:", response)
-    
-    # local IP / AT+CNACT?
-    print("Lokale IP-Adresse abfragen...")
-    response = send_at_command(ser, "AT+CNACT?", "OK", timeout=5)
-    print("Lokale IP-Adresse:", response)
-
-    
+try: 
 
     # Netzwerkregistrierung überprüfen
     print("Netzwerk-Status überprüfen...")
@@ -62,6 +50,18 @@ try:
     if "CONNECT OK" not in response:
         print("Fehler: TCP Verbindung konnte nicht aufgebaut werden.")
         exit()
+
+    # Open wireless connection
+    print("Open wireless connection...")
+    response = send_at_command(ser, "AT+CNACT=1, 'internet'", "OK", timeout=5)
+    print("Wireless connection:", response)
+    
+    # local IP / AT+CNACT?
+    print("Lokale IP-Adresse abfragen...")
+    response = send_at_command(ser, "AT+CNACT?", "OK", timeout=5)
+    print("Lokale IP-Adresse:", response)
+
+
 
     # MQTT-Parameter konfigurieren
     print("MQTT-Parameter konfigurieren...")
