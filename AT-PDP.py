@@ -54,7 +54,7 @@ def main():
         print("Status of the profiles (CGACT):", response)
         
         # Activate PDP profile 3
-        response = send_at_command(ser, "AT+CGACT=1,13", delay=1)
+        response = send_at_command(ser, "AT+CGACT=1,1", delay=1)
         print("Activate PDP profile 3:", response)
         
         # Check status of PDP profiles
@@ -62,7 +62,7 @@ def main():
         print("Status of the profiles (CGACT):", response)
         
         # Deactivate profile 3
-        response = send_at_command(ser, "AT+CGACT=0,13", delay=1)
+        response = send_at_command(ser, "AT+CGACT=0,1", delay=1)
         print("Deactivate profile 3:", response)
         
         # Check status of PDP profiles
