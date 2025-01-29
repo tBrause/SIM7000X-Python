@@ -42,11 +42,11 @@ def main():
     try:
         # Serielle Verbindung öffnen
         ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=5)
-        print(f"Serielle Verbindung geöffnet: {SERIAL_PORT} mit Baudrate {BAUD_RATE}")
+        print(f"Serielle Verbindung geöffnet: {SERIAL_PORT} mit Baudrate {BAUD_RATE}\n")
 
         
         # List of supported responses
-        response = send_at_command(ser, "AT+CGACT=?")
+        response = send_at_command(ser, "AT+CGACT=?", "OK", timeout=5)
         print("List of supported responses:", response)
         
     except Exception as e:
