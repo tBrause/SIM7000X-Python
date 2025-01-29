@@ -46,16 +46,20 @@ def main():
 
         
         # List of supported responses
-        response = send_at_command(ser, "AT+CGACT=?", delay=5)
+        response = send_at_command(ser, "AT+CGACT=?", delay=1)
         print("List of supported responses:", response)
         
         # Check the status of the profiles (CGACT)
-        response = send_at_command(ser, "AT+CGACT?", delay=5)
+        response = send_at_command(ser, "AT+CGACT?", delay=1)
         print("Status of the profiles (CGACT):", response)
         
         # Activate PDP profile 3
-        response = send_at_command(ser, "AT+CGACT=1,13", delay=5)
+        response = send_at_command(ser, "AT+CGACT=1,13", delay=1)
         print("Activate PDP profile 3:", response)
+        
+        # Check the status of the profiles (CGACT)
+        response = send_at_command(ser, "AT+CGACT?", delay=1)
+        print("Status of the profiles (CGACT):", response)
         
     except Exception as e:
         print(f"Fehler bei der Verarbeitung: {e}")
