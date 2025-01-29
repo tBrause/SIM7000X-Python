@@ -21,12 +21,6 @@ ser = serial.Serial(serial_port, baud_rate, timeout=1)
 print(f"Serielle Verbindung geöffnet: {serial_port} mit Baudrate {baud_rate}")
 
 try:
-    # Debugging aktivieren
-    """
-    response = send_at_command(ser, "AT+SMLOG=1", "OK", timeout=5)
-    print("Debugging aktiviert:", response)
-    """
-
     # Netzwerkregistrierung überprüfen
     print("Netzwerk-Status überprüfen...")
     response = send_at_command(ser, "AT+CREG?", "+CREG: 0,1", timeout=5)
@@ -50,62 +44,47 @@ try:
 
     # MQTT-Parameter konfigurieren
     print("MQTT-Parameter konfigurieren...")
-    response = send_at_command(ser, 'AT+SMCONF="URL","test.mosquitto.org","1883"', "OK", timeout=5)
-    print("Antwort:", response)
-    
-    response = send_at_command(ser, 'AT+SMCONF="CLIENTID","SIM7000X_Client_123"', "OK", timeout=5)
-    print("Antwort:", response)
+    send_at_command(ser, 'AT+SMCONF="URL","test.mosquitto.org","1883"', "OK", timeout=5)
+    send_at_command(ser, 'AT+SMCONF="CLIENTID","SIM7000X_Client_123"', "OK", timeout=5)
+    send_at_command(ser, 'AT+SMCONF="KEEPTIME",60', "OK", timeout=5)
+    send_at_command(ser, 'AT+SMCONF="CLEANSS",1', "OK", timeout=5)
 
-    response = send_at_command(ser, 'AT+SMCONF="KEEPTIME",60', "OK", timeout=5)
-    print("Antwort:", response)
-
-    response = send_at_command(ser, 'AT+SMCONF="CLEANSS",1', "OK", timeout=5)
-    print("Antwort:", response)
-
-    # Optional: Authentifizierung
-    # response = send_at_command(ser, 'AT+SMCONF="USERNAME","dein_benutzername"', "OK", timeout=5)
-    # print("Antwort:", response)
-    # response = send_at_command(ser, 'AT+SMCONF="PASSWORD","dein_passwort"', "OK", timeout=5)
-    # print("Antwort:", response)
-
-    # MQTT-Dienst überprüfen
+    # MQTT-Status überprüfen
     print("MQTT-Dienst überprüfen...")
     response = send_at_command(ser, 'AT+SMSTATE?', "OK", timeout=5)
     print("Antwort:", response)
     
-    if "OK" not in response:
-        print("Fehler: MQTT-Dienst konnte nicht aktiviert werden.")
-        exit()
-    
-    
-    # MQTT-Status aktivieren
-    print("MQTT-Status aktivieren...")
-    response = send_at_command(ser, "AT+SMSTATE?", "+SMSTATE: 1", timeout=5)
-    print("Antwort:", response)
     if "+SMSTATE: 1" not in response:
-        print("Fehler: MQTT-Dienst ist nicht aktiviert.")
-        exit()
-
+        print("❌ Fehler: MQTT-Dienst ist nicht aktiv.")
+    
     # MQTT-Verbindung herstellen
     print("MQTT-Verbindung herstellen...")
     response = send_at_command(ser, "AT+SMCONN", "OK", timeout=20)  # Erhöhter Timeout
     print("Antwort:", response)
+    time.sleep(3)  # Warte, um sicherzustellen, dass die Verbindung aufgebaut ist
     if "ERROR" in response:
         print("Fehler bei der MQTT-Verbindung.")
         exit()
 
+    # MQTT-Status erneut überprüfen
+    response = send_at_command(ser, "AT+SMSTATE?", "+SMSTATE: 1", timeout=5)
+    if "+SMSTATE: 1" not in response:
+        print("Fehler: MQTT ist nicht aktiv.")
+        exit()
+    
     # Nachricht veröffentlichen
     print("Nachricht veröffentlichen...")
     response = send_at_command(ser, 'AT+SMPUB="python/mqtt",5,1,0', ">", timeout=5)
     print("Antwort:", response)
     if ">" in response:
-        ser.write("Hello".encode())  # Sende die Nachricht
+        ser.write("Hello\r\n".encode())  # Nachricht senden mit "\r\n"
         time.sleep(0.5)
 
-    # MQTT-Verbindung trennen
-    print("MQTT-Verbindung trennen...")
-    response = send_at_command(ser, "AT+SMDISC", "OK", timeout=5)
-    print("Antwort:", response)
+    # MQTT-Verbindung trennen, aber nur wenn aktiv
+    if "+SMSTATE: 1" in send_at_command(ser, "AT+SMSTATE?", "+SMSTATE: 1", timeout=5):
+        print("MQTT-Verbindung trennen...")
+        response = send_at_command(ser, "AT+SMDISC", "OK", timeout=5)
+        print("Antwort:", response)
 
 finally:
     # Serielle Verbindung schließen
