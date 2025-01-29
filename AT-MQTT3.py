@@ -62,12 +62,17 @@ try:
 
     # MQTT-Dienst aktivieren
     print("MQTT-Dienst aktivieren...")
-    response = send_at_command(ser, 'AT+SMCONF="START",1', "OK", timeout=5)
+    response = send_at_command(ser, 'AT+SMSTATE?', "OK", timeout=5)
+    
     print("Antwort:", response)
+    
     if "OK" not in response:
         print("Fehler: MQTT-Dienst konnte nicht aktiviert werden.")
         exit()
 
+    response = send_at_command(ser, "AT+SMSTATE?", "+SMSTATE: 1", timeout=5)
+    
+    
     # MQTT-Status überprüfen
     print("MQTT-Status überprüfen...")
     response = send_at_command(ser, "AT+SMSTATE?", "+SMSTATE: 1", timeout=5)
