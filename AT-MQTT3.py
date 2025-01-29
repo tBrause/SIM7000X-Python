@@ -56,6 +56,24 @@ try:
     
     if "+SMSTATE: 1" not in response:
         print("Fehler: MQTT-Dienst ist nicht aktiv.")
+        
+    # Falls MQTT-Dienst nicht aktiv ist, manuell starten
+    if "+SMSTATE: 0" in response:
+      print("MQTT-Dienst ist nicht aktiv. Starte den Dienst...")
+    
+      response = send_at_command(ser, "AT+SMDISC", "OK", timeout=5)  # Falls vorher verbunden
+      print("MQTT-Reset:", response)
+
+      response = send_at_command(ser, "AT+SMCONN", "OK", timeout=10)  # Versuche Verbindung erneut
+      print("MQTT-Verbindung:", response)
+    
+      response = send_at_command(ser, "AT+SMSTATE?", "OK", timeout=5)  # Status erneut prüfen
+      print("Neuer MQTT-Status:", response)
+
+    if "+SMSTATE: 1" not in response:
+        print("Fehler: MQTT-Dienst konnte nicht aktiviert werden.")
+        exit()
+
     
     # MQTT-Verbindung herstellen
     print("MQTT-Verbindung herstellen...")
