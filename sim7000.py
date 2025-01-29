@@ -6,7 +6,7 @@ from datetime import datetime
 
 CMD_LINEBREAK = b'\r\n'
 
-PORT = "/dev/ttyUSB0"
+PORT = "/dev/serial0"
 BAUD = 9600
 
 # Mosquitto.org Settings
