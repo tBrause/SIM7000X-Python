@@ -49,6 +49,10 @@ def main():
         response = send_at_command(ser, "AT+CGACT=?", delay=5)
         print("List of supported responses:", response)
         
+        # Check the status of the profiles (CGACT)
+        response = send_at_command(ser, "AT+CGACT?", delay=5)
+        print("Status of the profiles (CGACT):", response)
+        
     except Exception as e:
         print(f"Fehler bei der Verarbeitung: {e}")
     finally:
