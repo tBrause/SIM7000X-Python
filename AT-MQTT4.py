@@ -42,7 +42,7 @@ def watch(timeout=10, success=None, failure=None, echo_cmd=None):
                         return ("Error", reply, time.time()-t_start)
             if (time.time()-t_start) > timeout:
                 return ("Timeout", reply, time.time()-t_start)
-            time.sleep(0.02)
+            time.sleep(10)
 
 def AT(cmd="", timeout=30, success="OK", failure="+CME ERROR"):
     cmd = 'AT' + cmd
