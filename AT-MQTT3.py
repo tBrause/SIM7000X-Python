@@ -21,6 +21,10 @@ ser = serial.Serial(serial_port, baud_rate, timeout=1)
 print(f"Serielle Verbindung geöffnet: {serial_port} mit Baudrate {baud_rate}")
 
 try:
+    # Debugging aktivieren
+    response = send_at_command(ser, "AT+SMLOG=1", "OK", timeout=5)
+    print("Debugging aktiviert:", response)
+
     # Netzwerkregistrierung überprüfen
     response = send_at_command(ser, "AT+CREG?", "+CREG: 0,1", timeout=5)
     print("Netzwerk-Status:", response)
@@ -69,8 +73,6 @@ try:
     if "OK" not in response:
         print("Fehler: MQTT-Dienst konnte nicht aktiviert werden.")
         exit()
-
-    response = send_at_command(ser, "AT+SMSTATE?", "+SMSTATE: 1", timeout=5)
     
     
     # MQTT-Status überprüfen
