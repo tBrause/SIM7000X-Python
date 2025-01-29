@@ -53,9 +53,6 @@ try:
         print("Fehler: TCP Verbindung konnte nicht aufgebaut werden.")
         exit()
 
-    response = send_at_command(ser, 'AT+CIPPING="8.8.8.8",1,16,5000,64', "OK", timeout=5)
-    print("Ergebnis des PING-Tests:", response)
-
     # MQTT-Parameter konfigurieren
     print("MQTT-Parameter konfigurieren...")
     send_at_command(ser, 'AT+SMCONF="URL","test.mosquitto.org","1883"', "OK", timeout=5)
