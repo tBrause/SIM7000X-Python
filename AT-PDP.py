@@ -24,10 +24,8 @@ def send_at_command(ser, command, delay=1):
         #print(f"Sende Befehl: {command}")
         ser.write((command + "\r").encode())  # Sende den AT-Befehl mit Carriage Return
         time.sleep(delay)  # Warte auf die Antwort
-        response = ser.read_all().decode().strip()  # Lies die Antwort
-        if response:
-            print(f"Antwort: {response}")
-        else:
+        response = ser.read_all().decode().strip()  # Lies die Antwort und entferne Leerzeichen
+        if not response:
             print(f"Keine Antwort auf Befehl: {command}")
         return response
     except Exception as e:
@@ -49,7 +47,7 @@ def main():
         
         # List of supported responses
         response = send_at_command(ser, "AT+CGACT=?")
-        print("Antwort:", response)
+        print("List of supported responses:", response)
         
     except Exception as e:
         print(f"Fehler bei der Verarbeitung: {e}")
