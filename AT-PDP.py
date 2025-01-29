@@ -48,7 +48,7 @@ def main():
 
         
         # List of supported responses
-        response = send_at_command(ser, "AT")
+        response = send_at_command(ser, "AT+CGACT=?")
         print("Antwort:", response)
         
     except Exception as e:
