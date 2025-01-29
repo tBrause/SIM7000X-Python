@@ -53,6 +53,10 @@ def main():
         response = send_at_command(ser, "AT+CGACT?", delay=5)
         print("Status of the profiles (CGACT):", response)
         
+        # Activate PDP profile 3
+        response = send_at_command(ser, "AT+CGACT=1,3", delay=5)
+        print("Activate PDP profile 3:", response)
+        
     except Exception as e:
         print(f"Fehler bei der Verarbeitung: {e}")
     finally:
