@@ -44,7 +44,7 @@ def watch(timeout=10, success=None, failure=None, echo_cmd=None):
                 return ("Timeout", reply, time.time()-t_start)
             time.sleep(3)
 
-def AT(cmd="", timeout=10, success="OK", failure="+CME ERROR"):
+def AT(cmd="", timeout=1, success="OK", failure="+CME ERROR"):
     cmd = 'AT' + cmd
     print("----------- ", cmd, " -----------")
     send_cmd(cmd)
