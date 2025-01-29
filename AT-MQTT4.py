@@ -80,8 +80,8 @@ cgcontrdp = AT("+CGCONTRDP") # Get APN and IP address
 # Check nb-iot Status
 AT('+CGNAPN')
 
-APN = cgcontrdp[1][0].split(",")[2]
-IP = cgcontrdp[1][0].split(",")[3]
+#APN = cgcontrdp[1][0].split(",")[2]
+#IP = cgcontrdp[1][0].split(",")[3]
 
 
 # MQTT (No SSL) - Working :-)
