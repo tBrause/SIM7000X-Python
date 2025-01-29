@@ -47,7 +47,7 @@ try:
 
     # TCP Verbindung aufbauen
     print("TCP Verbindung aufbauen...")
-    response = send_at_command(ser, 'AT+CIPSTART="TCP","8.8.8.8","80"', "CONNECT OK", timeout=10)
+    response = send_at_command(ser, 'AT+CIPSTART="TCP","sanberlin.com","80"', "CONNECT OK", timeout=10)
     print("TCP Verbindung aufgebaut:", response)
     if "CONNECT OK" not in response:
         print("Fehler: TCP Verbindung konnte nicht aufgebaut werden.")
