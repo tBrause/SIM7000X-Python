@@ -22,17 +22,11 @@ ser = serial.Serial(serial_port, baud_rate, timeout=1)
 print(f"Serielle Verbindung geöffnet: {serial_port} mit Baudrate {baud_rate}")
 
 try:
-    
+    # Netzwerkregistrierung überprüfen
     response = send_at_command(ser, "AT+CREG?", "OK", timeout=5)
     print("Netzwerk-Status:", response)
 
-
-    # Status des MQTT-Dienstes abfragen
-    print("Status des MQTT-Dienstes abfragen...")
-    response = send_at_command(ser, "AT+SMSTATE?", "STATE: 0", timeout=5)
-    print("Antwort:", response)
-    
-    # 1. APN konfigurieren
+    # APN konfigurieren
     print("APN konfigurieren...")
     response = send_at_command(ser, 'AT+CGDCONT=1,"IP","internet"', "OK", timeout=5)
     print("Antwort:", response)
@@ -40,33 +34,21 @@ try:
     response = send_at_command(ser, "AT+CGACT=1,1", "OK", timeout=5)
     print("Datenverbindung aktiviert:", response)
     
-    """
-    response = send_at_command(ser, "AT+CIFSR", ".", timeout=5)
-    print("IP-Adresse:", response)
-    """
-
-
-    # 2. MQTT-Parameter konfigurieren
+    # MQTT-Parameter konfigurieren
     print("MQTT-Parameter konfigurieren...")
-    response = send_at_command(ser, 'AT+SMCONF="URL","mqtt://emqx.c2.energywan.de","1883"', "OK", timeout=5)
+    response = send_at_command(ser, 'AT+SMCONF="URL","emqx.c2.energywan.de","1883"', "OK", timeout=5)
     print("Antwort:", response)
     
     response = send_at_command(ser, 'AT+SMCONF="CLIENTID","SIM7000X_Client"', "OK", timeout=5)
     print("Antwort:", response)
 
     # Optional: Benutzername und Passwort, falls benötigt
-    """
-    response = send_at_command(ser, 'AT+SMCONF="USERNAME","your_username"', "OK", timeout=5)
-    print("Antwort:", response)
-    response = send_at_command(ser, 'AT+SMCONF="PASSWORD","your_password"', "OK", timeout=5)
-    print("Antwort:", response)
-    
-    response = send_at_command(ser, 'AT+SMCONF="USERNAME","your_username"', "OK", timeout=5)
-    print("Antwort:", response)
-    response = send_at_command(ser, 'AT+SMCONF="PASSWORD","your_password"', "OK", timeout=5)
-    print("Antwort:", response)
-    """
-    # 3. MQTT-Verbindung herstellen
+    # response = send_at_command(ser, 'AT+SMCONF="USERNAME","your_username"', "OK", timeout=5)
+    # print("Antwort:", response)
+    # response = send_at_command(ser, 'AT+SMCONF="PASSWORD","your_password"', "OK", timeout=5)
+    # print("Antwort:", response)
+
+    # MQTT-Verbindung herstellen
     print("MQTT-Verbindung herstellen...")
     response = send_at_command(ser, "AT+SMCONN", "OK", timeout=10)
     print("Antwort:", response)
@@ -74,7 +56,7 @@ try:
         print("Fehler bei der MQTT-Verbindung.")
         exit()
 
-    # 4. Nachricht veröffentlichen
+    # Nachricht veröffentlichen
     print("Nachricht veröffentlichen...")
     response = send_at_command(ser, 'AT+SMPUB="python/mqtt",5,1,0', ">", timeout=5)  # 5 = Nachrichtengröße
     print("Antwort:", response)
@@ -82,7 +64,7 @@ try:
         ser.write("Hello".encode())  # Sende die Nachricht
         time.sleep(0.5)
 
-    # 5. MQTT-Verbindung trennen
+    # MQTT-Verbindung trennen
     print("MQTT-Verbindung trennen...")
     response = send_at_command(ser, "AT+SMDISC", "OK", timeout=5)
     print("Antwort:", response)
