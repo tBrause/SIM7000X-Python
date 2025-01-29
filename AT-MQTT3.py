@@ -26,6 +26,7 @@ try:
     print("Debugging aktiviert:", response)
 
     # Netzwerkregistrierung überprüfen
+    print("Netzwerk-Status überprüfen...")
     response = send_at_command(ser, "AT+CREG?", "+CREG: 0,1", timeout=5)
     print("Netzwerk-Status:", response)
     if "+CREG: 0,1" not in response:
@@ -38,6 +39,7 @@ try:
     print("Antwort:", response)
     
     # Datenverbindung aktivieren
+    print("Datenverbindung aktivieren...")
     response = send_at_command(ser, "AT+CGACT=1,1", "OK", timeout=5)
     print("Datenverbindung aktiviert:", response)
     if "OK" not in response:
@@ -67,7 +69,6 @@ try:
     # MQTT-Dienst aktivieren
     print("MQTT-Dienst aktivieren...")
     response = send_at_command(ser, 'AT+SMSTATE?', "OK", timeout=5)
-    
     print("Antwort:", response)
     
     if "OK" not in response:
