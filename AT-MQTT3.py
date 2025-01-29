@@ -42,7 +42,7 @@ try:
 
     # MQTT-Parameter konfigurieren
     print("MQTT-Parameter konfigurieren...")
-    response = send_at_command(ser, 'AT+SMCONF="URL","emqx.c2.energywan.de","1883"', "OK", timeout=5)
+    response = send_at_command(ser, 'AT+SMCONF="URL","test.mosquitto.org","1883"', "OK", timeout=5)
     print("Antwort:", response)
     
     response = send_at_command(ser, 'AT+SMCONF="CLIENTID","SIM7000X_Client_123"', "OK", timeout=5)
