@@ -201,7 +201,7 @@ if sys.argv[1] == "mqtt-cacert":
     AT('+SMCONF="CLIENTID", "TOMTEST01"')
     AT('+SMCONF="KEEPTIME",60') # Set the MQTT connection time (timeout?)
     AT('+SMCONF="CLEANSS",1')
-    AT('+SMCONF="URL","{}","8883"'.format(MQTT_URL)) # Set MQTT address
+    AT('+SMCONF="URL","mqtts.emqx.c2.energywan.de","8883"'.format(MQTT_URL)) # Set MQTT address
     AT('+CSSLCFG="ctxindex", 0') # Use index 1
     AT('+CSSLCFG="sslversion",0,3') # TLS 1.2
     AT('+CSSLCFG="convert",2,"{}"'.format(CA_NAME))
