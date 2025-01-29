@@ -21,6 +21,11 @@ ser = serial.Serial(serial_port, baud_rate, timeout=1)
 print(f"Serielle Verbindung geöffnet: {serial_port} mit Baudrate {baud_rate}")
 
 try:
+    
+    response = send_at_command(ser, 'AT+CIPPING="8.8.8.8",1,16,5000,64', "OK", timeout=10)
+    print("PING Test:", response)
+
+
     # Netzwerkregistrierung überprüfen
     print("Netzwerk-Status überprüfen...")
     response = send_at_command(ser, "AT+CREG?", "+CREG: 0,1", timeout=5)
