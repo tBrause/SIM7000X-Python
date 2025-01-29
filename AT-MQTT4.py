@@ -76,7 +76,7 @@ AT('+CBAND?') # Get band
 AT("+CGREG?") # Get network registration status
 AT("+CGACT?") # Show PDP context state
 AT('+CGPADDR') # Show PDP address
-cgcontrdp = AT("+CGCONTRDP") # Get APN and IP address
+cgcontrdp = AT("+CGCONTRDP", timeout=30) # Get APN and IP address
 # Check nb-iot Status
 AT('+CGNAPN')
 
