@@ -22,8 +22,10 @@ print(f"Serielle Verbindung geöffnet: {serial_port} mit Baudrate {baud_rate}")
 
 try:
     # Debugging aktivieren
+    """
     response = send_at_command(ser, "AT+SMLOG=1", "OK", timeout=5)
     print("Debugging aktiviert:", response)
+    """
 
     # Netzwerkregistrierung überprüfen
     print("Netzwerk-Status überprüfen...")
