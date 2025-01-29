@@ -55,7 +55,7 @@ try:
     print("Antwort:", response)
     
     if "+SMSTATE: 1" not in response:
-        print("❌ Fehler: MQTT-Dienst ist nicht aktiv.")
+        print("Fehler: MQTT-Dienst ist nicht aktiv.")
     
     # MQTT-Verbindung herstellen
     print("MQTT-Verbindung herstellen...")
