@@ -57,9 +57,9 @@ def main():
         response = send_at_command(ser, "AT+CGACT=1,1", delay=1)
         print("Activate PDP profile 3:", response)
         
-        # Check status of PDP profiles
-        response = send_at_command(ser, "AT+CGACT?", delay=1)
-        print("Status of the profiles (CGACT):", response)
+        # AT+CNACT=1,"cmnet"
+        response = send_at_command(ser, 'AT+CNACT=1,"internet"', delay=1)
+        print("Wireless connection:", response)
         
         # Deactivate profile 3
         response = send_at_command(ser, "AT+CGACT=0,1", delay=1)
