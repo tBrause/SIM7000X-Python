@@ -24,8 +24,14 @@ try:
     
     # Open wireless connection
     print("Open wireless connection...")
-    response = send_at_command(ser, "AT+CNACT=1", "OK", timeout=5)
+    response = send_at_command(ser, "AT+CNACT=1, 'internet'", "OK", timeout=5)
     print("Wireless connection:", response)
+    
+    # local IP / AT+CNACT?
+    print("Lokale IP-Adresse abfragen...")
+    response = send_at_command(ser, "AT+CNACT?", "OK", timeout=5)
+    print("Lokale IP-Adresse:", response)
+
     
 
     # Netzwerkregistrierung überprüfen
