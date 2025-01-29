@@ -143,7 +143,7 @@ if sys.argv[1] == "mqtt-nossl":
     AT('+SMCONF="CLIENTID",1233')
     AT('+SMCONF="KEEPTIME",60') # Set the MQTT connection time (timeout?)
     AT('+SMCONF="CLEANSS",1')
-    AT('+SMCONF="URL","{}","1883"'.format(MQTT_URL)) # Set MQTT address
+    AT('+SMCONF="URL","emqx.c2.energywan.de","1883"'.format(MQTT_URL)) # Set MQTT address
     smstate = AT('+SMSTATE?') # Check MQTT connection state
     if smstate[1][0].split(":")[1].strip() == "0":
         AT('+SMCONN', timeout=30) # Connect to MQTT
