@@ -24,7 +24,7 @@ try:
     
     # Open wireless connection
     print("Open wireless connection...")
-    response = send_at_command(ser, "AT+CFUN=1", "OK", timeout=5)
+    response = send_at_command(ser, "AT+CNACT=1", "OK", timeout=5)
     print("Wireless connection:", response)
     
 
