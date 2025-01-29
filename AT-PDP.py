@@ -62,7 +62,7 @@ def main():
         print("Status of the profiles (CGACT):", response)
         
         # Deactivate profile 3
-        response = send_at_command(ser, "AT+CGACT=0,13", delay=1)
+        response = send_at_command(ser, "AT+CGACT=0,3", delay=1)
         print("Deactivate profile 3:", response)
         
     except Exception as e:
