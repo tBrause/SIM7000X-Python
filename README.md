@@ -43,3 +43,11 @@ python AT-SIM.py
 ```
 python AT-TCP.py
 ```
+
+### GPIO Verbindung
+
+> Testet die GPIO-Verbindung und sendet den AT Befehl: AT.
+
+```
+python AT-GPIO.py
+```
