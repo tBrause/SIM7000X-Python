@@ -22,7 +22,11 @@ print(f"Serielle Verbindung geöffnet: {serial_port} mit Baudrate {baud_rate}")
 
 try:
     
-
+    # Open wireless connection
+    print("Open wireless connection...")
+    response = send_at_command(ser, "AT+CFUN=1", "OK", timeout=5)
+    print("Wireless connection:", response)
+    
 
     # Netzwerkregistrierung überprüfen
     print("Netzwerk-Status überprüfen...")
@@ -55,10 +59,16 @@ try:
 
     # MQTT-Parameter konfigurieren
     print("MQTT-Parameter konfigurieren...")
-    send_at_command(ser, 'AT+SMCONF="URL","test.mosquitto.org","1883"', "OK", timeout=5)
+    send_at_command(ser, 'AT+SMCONF="URL","emqx.c2.energywan.de","1883"', "OK", timeout=5)
     send_at_command(ser, 'AT+SMCONF="CLIENTID","SIM7000X_Client_123"', "OK", timeout=5)
     send_at_command(ser, 'AT+SMCONF="KEEPTIME",60', "OK", timeout=5)
-    send_at_command(ser, 'AT+SMCONF="CLEANSS",1', "OK", timeout=5)
+    send_at_command(ser, 'AT+SMCONF="CLEANSS",0', "OK", timeout=5)
+    send_at_command(ser, 'AT+SMCONF="QOS",0', "OK", timeout=5)
+    send_at_command(ser, 'AT+SMCONF="TOPIC","python/mqtt"', "OK", timeout=5)
+    send_at_command(ser, 'AT+SMCONF="MESSAGE","Hello"', "OK", timeout=5)
+    send_at_command(ser, 'AT+SMCONF="RETAIN",0', "OK", timeout=5)
+    send_at_command(ser, 'AT+SMCONF="USERNAME","your_username"', "OK", timeout=5)
+    send_at_command(ser, 'AT+SMCONF="PASSWORD","your_password"', "OK", timeout=5)
 
     # MQTT-Status überprüfen
     print("MQTT-Dienst überprüfen...")
