@@ -60,6 +60,22 @@ try:
     # response = send_at_command(ser, 'AT+SMCONF="PASSWORD","dein_passwort"', "OK", timeout=5)
     # print("Antwort:", response)
 
+    # MQTT-Dienst aktivieren
+    print("MQTT-Dienst aktivieren...")
+    response = send_at_command(ser, 'AT+SMCONF="START",1', "OK", timeout=5)
+    print("Antwort:", response)
+    if "OK" not in response:
+        print("Fehler: MQTT-Dienst konnte nicht aktiviert werden.")
+        exit()
+
+    # MQTT-Status überprüfen
+    print("MQTT-Status überprüfen...")
+    response = send_at_command(ser, "AT+SMSTATE?", "+SMSTATE: 1", timeout=5)
+    print("Antwort:", response)
+    if "+SMSTATE: 1" not in response:
+        print("Fehler: MQTT-Dienst ist nicht aktiviert.")
+        exit()
+
     # MQTT-Verbindung herstellen
     print("MQTT-Verbindung herstellen...")
     response = send_at_command(ser, "AT+SMCONN", "OK", timeout=20)  # Erhöhter Timeout
