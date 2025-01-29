@@ -46,7 +46,7 @@ def main():
 
         
         # List of supported responses
-        response = send_at_command(ser, "AT+CGACT=?", "OK", timeout=5)
+        response = send_at_command(ser, "AT+CGACT=?", delay=5)
         print("List of supported responses:", response)
         
     except Exception as e:
