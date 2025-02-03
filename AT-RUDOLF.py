@@ -14,7 +14,9 @@ def main():
     
     try:
         # Initialize communication
-        send_at_command(ser, 'AT', 'OK')
+        response = send_at_command(ser, 'AT', 'OK')
+        print(f"AT response: {response}")
+        
         send_at_command(ser, 'AT+CMEE=2', 'OK')
         send_at_command(ser, 'AT+CNMP=38', 'OK')
         
@@ -22,6 +24,7 @@ def main():
         while True:
             response = send_at_command(ser, 'AT+CSQ', '+CSQ:')
             csq = int(response.split(':')[1].split(',')[0].strip())
+            print(f"AT+CSQ response: {response}, CSQ: {csq}")
             if csq < 99:
                 break
             time.sleep(1)
