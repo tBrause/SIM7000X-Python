@@ -24,7 +24,7 @@ def main():
         
         send_at_command(ser, 'AT+CMEE=2', 'OK')
         
-        send_at_command(ser, 'AT+CNMP=38', 'OK')
+        send_at_command(ser, 'AT+CNMP=2', 'OK')
         
         # Check signal quality
         while True:
