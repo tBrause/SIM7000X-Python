@@ -13,12 +13,26 @@ def main():
     ser = serial.Serial('/dev/serial0', 9600, timeout=1)
     
     try:
-        # Initialize communication
         response = send_at_command(ser, 'AT', 'OK')
         print(f"AT response: {response}")
         
-        send_at_command(ser, 'AT+CMEE=2', 'OK')
-        send_at_command(ser, 'AT+CNMP=38', 'OK')
+        # Überprüfen des Status der SIM-Karte
+        print("\n# Überprüfen des Status der SIM-Karte:")
+        send_at_command(ser, "AT+CPIN?", "READY")
+        
+        # Überprüfen der Netzverbindung
+        print("\n# Überprüfen der Netzverbindung:")
+        send_at_command(ser, "AT+CREG?", "0,1")
+        
+        # Setze den APN
+        print("\n# Setze den APN:")
+        send_at_command(ser, 'AT+CGDCONT=1,"IP","internet"', "OK")
+        
+        response = send_at_command(ser, 'AT+CMEE=2', 'OK')
+        print(f"AT+CMEE response: {response}")
+        
+        response = send_at_command(ser, 'AT+CNMP=38', 'OK')
+        print(f"AT+CNMP response: {response}")
         
         # Check signal quality
         while True:
