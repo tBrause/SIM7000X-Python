@@ -1,10 +1,11 @@
 import serial
 import time
 
-def send_at_command(ser, command, expected_response, timeout=2):
-    ser.write((command + '\r').encode())
+def send_at_command(ser, command, expected_response, timeout=1):
+    ser.write((command + '\r\n').encode())
     time.sleep(timeout)
-    response = ser.read(ser.in_waiting).decode()
+    response = ser.read(ser.inWaiting()).decode()
+    print(f"Antwort: {command}\n{response}")
     if expected_response not in response:
         raise Exception(f"Failed to execute {command}. Response: {response}")
     return response
