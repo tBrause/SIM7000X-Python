@@ -27,7 +27,7 @@ def main():
             time.sleep(1)
         
         send_at_command(ser, 'AT+COPS?', 'OK')
-        send_at_command(ser, 'AT+CNACT,"internet"', 'OK')
+        send_at_command(ser, 'AT+CNACT=1,"internet"', 'OK')
         send_at_command(ser, 'AT+CGATT?', 'OK')
         
         # Configure MQTT
