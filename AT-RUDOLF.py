@@ -2,7 +2,7 @@ import serial
 import time
 
 def send_at_command(ser, command, expected_response, timeout=1):
-    #ser.write((command + '\r\n').encode())
+    ser.write((command + '\r\n').encode())
     time.sleep(timeout)
     response = ser.read(ser.inWaiting()).decode()
     print(f"Antwort: {command}\n{response}")
