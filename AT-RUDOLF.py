@@ -49,6 +49,7 @@ def main():
         send_at_command(ser, 'AT+COPS?', 'OK')
         #send_at_command(ser, 'AT+CNACT=1,"internet"', 'OK')
         send_at_command(ser, 'AT+CGATT?', 'OK')
+        send_at_command(ser, 'AT+CNACT=1,"internet"', 'OK')
         
         # Configure MQTT
         send_at_command(ser, 'AT+SMCONF="URL","emqx.energywan.de","1883"', 'OK')
