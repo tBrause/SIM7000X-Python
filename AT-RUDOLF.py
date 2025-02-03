@@ -27,8 +27,8 @@ def main():
             time.sleep(1)
         
         send_at_command(ser, 'AT+COPS?', 'OK')
-        send_at_command(ser, 'AT+CNACT=1,"internet"', 'OK')
-        send_at_command(ser, 'AT+CGATT=1', 'OK')
+        send_at_command(ser, 'AT+CNACT,"internet"', 'OK')
+        send_at_command(ser, 'AT+CGATT?', 'OK')
         
         # Configure MQTT
         send_at_command(ser, 'AT+SMCONF="URL","emqx.energywan.de","1883"', 'OK')
