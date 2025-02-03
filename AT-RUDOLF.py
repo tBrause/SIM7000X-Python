@@ -18,11 +18,13 @@ def main():
         
         # Überprüfen des Status der SIM-Karte
         print("\n# Überprüfen des Status der SIM-Karte:")
-        send_at_command(ser, "AT+CPIN?", "READY")
+        response = send_at_command(ser, "AT+CPIN?", "READY")
+        print(f"AT response: {response}")
         
         # Überprüfen der Netzverbindung
         print("\n# Überprüfen der Netzverbindung:")
-        send_at_command(ser, "AT+CREG?", "0,1")
+        response = send_at_command(ser, "AT+CREG?", "0,1")
+        print(f"AT response: {response}")
         
         # Setze den APN
         print("\n# Setze den APN:")
@@ -44,7 +46,7 @@ def main():
             time.sleep(1)
         
         send_at_command(ser, 'AT+COPS?', 'OK')
-        send_at_command(ser, 'AT+CNACT=1,"internet"', 'OK')
+        #send_at_command(ser, 'AT+CNACT=1,"internet"', 'OK')
         send_at_command(ser, 'AT+CGATT?', 'OK')
         
         # Configure MQTT
