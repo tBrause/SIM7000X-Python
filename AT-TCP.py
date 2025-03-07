@@ -7,6 +7,7 @@ import time
 ser = serial.Serial('/dev/serial0',9600)
 ser.flushInput()
 
+# c
 power_key = 6
 rec_buff = ''
 APN = 'internet'
