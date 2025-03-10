@@ -1,5 +1,29 @@
 # SIM7000X-Python
 
+# Vorbereitungen
+
+## raspi-config
+
+```
+sudo raspi-config
+```
+
+> Wechsle zu: 3. Interface Options
+
+> Wechsle zu: I6 Serial Port
+
+> Would you like a login shell to be accessible over serial? : NO
+
+> Would you like the serial port hardware to be enabled? : YES
+
+> Infofenster: OK
+
+> Wechsle zu: FINISH
+
+> Would you like reboot now? : YES
+
+---
+
 ## Allgemeine Tests
 
 ### Serieller Port
