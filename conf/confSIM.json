@@ -1,0 +1,20 @@
+{
+	"#Comment":"General configuration",
+	"BITRATE":115200,
+	"BND":"NB-IOT",
+	"QOS":"1",
+	"GPS_CYC":60,
+	"ETX_CYC":300,
+	"STD_TO":30,
+	"OPS_TO":250,
+	"CON_TO":200,
+	"PUB_TO":60,
+	"CSQ_CT":5,
+	"MAX_ERR":4,
+	"MAX_STATE":15
+	"rssi":"%d",
+	"lon":"%.6f",
+	"lat":"%.6f",
+	"speed":"%.2f",
+	"course":"%.2f"
+}

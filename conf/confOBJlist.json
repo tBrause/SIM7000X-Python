@@ -1,0 +1,10 @@
+{
+	"#Comment":"EnergyWAN: CAN object list",
+	"6002":{"mask":1,"key":"state","val":32960,"form":"%04X","comm":"Device state"},
+	"6040":{"mask":1,"key":"u","val":55626,"form":"%.3f","comm":"Device actual voltage"},
+	"603E":{"mask":2,"key":"i","val":-350,"form":"%.3f","comm":"Device actual current"},
+	"6042":{"mask":0,"key":"t","val":396,"form":"%.1f","comm":"Device temperature"},
+	"6164":{"mask":1,"key":"soc","val":180,"form":"%.2f","comm":"Relatice capacity [Wh]"},
+	"6176":{"mask":0,"key":"soh","val":10000,"form":"%.2f","comm":"Battery pack SOH"},
+	"6160":{"mask":2,"key":"paca","val":18717,"form":"%.3f","comm":"Battery actual capacity"}
+}
