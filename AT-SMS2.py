@@ -3,9 +3,24 @@
 import serial
 import time
 
+# Importiere die Konfiguration aus der Datei: ./conf/confDevice.json
+import json
+
+with open('./conf/confDevice.json') as json_file:
+    data = json.load(json_file)
+    SERIAL_PORT = data['SERIAL_PORT']
+    BAUD_RATE = data['BAUD_RATE']
+    PROVAPN = data['PROVAPN']
+    PROVOPS = data['PROVOPS']
+    SIMPIN = data['SIMPIN']
+
+with open('./conf/confSIM.json') as json_file:
+    data = json.load(json_file)
+    BITRATE = data['BITRATE']
+
 # Konfiguration der seriellen Schnittstelle
-SERIAL_PORT = "/dev/serial0"
-BAUD_RATE = 9600
+SERIAL_PORT = SERIAL_PORT
+BAUD_RATE = BAUD_RATE
 PHONE_NUMBER = "+491784576321"
 MESSAGE = "Hallo! Dies ist eine Test-SMS vom SIM7000X."
 

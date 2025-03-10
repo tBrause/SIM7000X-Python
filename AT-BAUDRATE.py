@@ -1,7 +1,7 @@
 import serial
 
 SERIAL_PORT = "/dev/serial0"
-TEST_BAUDRATES = [9600, 19200, 38400, 57600, 115200]  # Baudraten zum Testen
+TEST_BAUDRATES = [115200]  # Baudraten zum Testen
 TEST_COMMAND = b"AT\r"  # Beispielbefehl für SIM7000 oder NB-IoT
 EXPECTED_RESPONSE = b"OK"  # Typische Antwort auf "AT"
 

@@ -1,13 +1,13 @@
 {
 	"#Comment": "Device configuration",
 	"PROVAPN": "internet",
-	"PROVOPS": "0",
-	"SIMPIN": "",
-	"URL": "emqx.energywan.de;1883",
-	"USERNAME": "Labortory",
-	"PASSWORD": "Uc6RncyxfyPeH4w",
-	"TOPIC": "energywan/laboratory",
-	"DEVICEID": "energywan/laboratory",
+	"PROVOPS": "26203",
+	"SIMPIN": "2814",
+	"URL": "emqx.c2.energywan.de;1883",
+	"USERNAME": "sww_ZL6xVtWQjN",
+	"PASSWORD": "sukFYfDzvrnsy8hD",
+	"TOPIC": "energywan/sww",
+	"DEVICEID": "energywan/sww",
 	"CLIENTID": "EnWAN10997",
 	"DEVICENO": "3"
 }
