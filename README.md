@@ -22,6 +22,22 @@ sudo raspi-config
 
 > Would you like reboot now? : YES
 
+## Bibliotheken
+
+`sudo apt update`
+
+`sudo apt install python3-serial python3-rpi.gpio`
+
+## Scripte
+
+> Beginnen mit:
+
+`#!/usr/bin/env python3`
+
+## Ausführbar machen
+
+`chmod +x *.py`
+
 ---
 
 ## Allgemeine Tests
