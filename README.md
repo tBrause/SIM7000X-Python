@@ -8,7 +8,7 @@
 sudo raspi-config
 ```
 
-> Wechsle zu: 3. Interface Options
+> Wechsle zu: 3. `Interface Options`
 
 > Wechsle zu: I6 Serial Port
 
@@ -24,19 +24,27 @@ sudo raspi-config
 
 ## Bibliotheken
 
-`sudo apt update`
+```
+sudo apt update
+```
 
-`sudo apt install python3-serial python3-rpi.gpio`
+```
+sudo apt install python3-serial python3-rpi.gpio
+```
 
 ## Scripte
 
 > Beginnen mit:
 
-`#!/usr/bin/env python3`
+```
+#!/usr/bin/env python3
+```
 
 ## Ausführbar machen
 
-`chmod +x *.py`
+```
+chmod +x *.py
+```
 
 ---
 
