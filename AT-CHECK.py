@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import serial
 
 ser = serial.Serial("/dev/virtual_serial0", baudrate=9600, timeout=1)
