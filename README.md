@@ -32,6 +32,33 @@ sudo apt update
 sudo apt install python3-serial python3-rpi.gpio
 ```
 
+> Lösche console=serial0,115200
+
+```
+sudo nano /boot/firmware/cmdline.txt
+```
+
+```
+sudo reboot
+```
+
+## Kommunikation als User
+
+```
+sudo usermod -a -G dialout $USER
+```
+
+```
+newgrp dialout
+```
+
+## Autostart 
+
+```
+sudo systemctl disable serial-getty@serial0.service
+sudo systemctl stop serial-getty@serial0.service
+```
+
 ## Scripte
 
 > Beginnen mit:
