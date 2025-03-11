@@ -59,6 +59,16 @@ sudo systemctl stop serial-getty@serial0.service
 sudo reboot
 ```
 
+## Serielle Ports mit socat in mehrere Instanzen aufteilen
+
+```
+sudo apt update
+```
+
+```
+sudo apt install socat
+```
+
 ## Scripte
 
 > Beginnen mit:
