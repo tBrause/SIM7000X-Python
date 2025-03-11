@@ -22,6 +22,22 @@ sudo raspi-config
 
 > Would you like reboot now? : `YES`
 
+## Python 3
+
+```
+python --version
+```
+
+> Wenn Python 3 nicht installiert ist
+
+```
+sudo apt update
+```
+
+```
+sudo apt install python3
+```
+
 ## Bibliotheken
 
 ```
