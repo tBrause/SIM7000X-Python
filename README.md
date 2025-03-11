@@ -2,7 +2,7 @@
 
 # Vorbereitungen
 
-## raspi-config
+## Seriellen Port aktivieren
 
 ```
 sudo raspi-config
