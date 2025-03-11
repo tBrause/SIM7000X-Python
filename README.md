@@ -46,13 +46,15 @@ newgrp dialout
 sudo reboot
 ```
 
-## Autostart
+## Autostart verhindern
 
 ### Entferne: console=serial0,115200
 
 ```
 sudo nano /boot/firmware/cmdline.txt
 ```
+
+### Deaktiviere serial0
 
 ```
 sudo systemctl disable serial-getty@serial0.service
