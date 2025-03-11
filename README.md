@@ -97,6 +97,12 @@ sudo apt install socat
 sudo socat -d -d pty,link=/dev/virtual_serial0,raw tcp:localhost:9000 &
 ```
 
+```
+sudo systemctl unmask serial-getty@virtual_serial0.service
+sudo systemctl enable serial-getty@virtual_serial0.service
+sudo systemctl start serial-getty@virtual_serial0.service
+```
+
 ## Scripte
 
 ### Ausführbar machen
