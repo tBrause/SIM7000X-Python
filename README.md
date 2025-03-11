@@ -81,16 +81,16 @@ sudo socat -d -d pty,link=/dev/virtual_serial0,raw tcp:localhost:9000 &
 
 ## Scripte
 
-> Beginnen mit:
-
-```
-#!/usr/bin/env python3
-```
-
 ## Ausführbar machen
 
 ```
 chmod +x *.py
+```
+
+## Erste Zeile aller Python Scripte
+
+```
+#!/usr/bin/env python3
 ```
 
 ---
