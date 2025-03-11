@@ -69,7 +69,7 @@ sudo apt update
 sudo apt install socat
 ```
 
-> LTE-Modem soll `/dev/virtual_serial0` nutzen
+> SIM7000X HAT soll `/dev/virtual_serial0` nutzen
 
 ```
 sudo socat -d -d pty,link=/dev/virtual_serial0,raw tcp:localhost:9000 &
