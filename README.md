@@ -103,6 +103,10 @@ sudo systemctl enable serial-getty@virtual_serial0.service
 sudo systemctl start serial-getty@virtual_serial0.service
 ```
 
+```
+sudo reboot
+```
+
 ## Scripte
 
 ### Ausführbar machen
