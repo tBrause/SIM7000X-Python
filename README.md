@@ -42,6 +42,10 @@ sudo usermod -a -G dialout $USER
 newgrp dialout
 ```
 
+```
+sudo reboot
+```
+
 ## Autostart
 
 ### Entferne: console=serial0,115200
