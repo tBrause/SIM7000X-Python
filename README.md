@@ -8,19 +8,19 @@
 sudo raspi-config
 ```
 
-> Wechsle zu: 3. `Interface Options`
+> Wechsle zu: `3. Interface Options`
 
-> Wechsle zu: I6 Serial Port
+> Wechsle zu: `I6 Serial Port`
 
-> Would you like a login shell to be accessible over serial? : NO
+> Would you like a login shell to be accessible over serial? : `NO`
 
-> Would you like the serial port hardware to be enabled? : YES
+> Would you like the serial port hardware to be enabled? : `YES`
 
-> Infofenster: OK
+> Infofenster: `OK`
 
-> Wechsle zu: FINISH
+> Wechsle zu: `FINISH`
 
-> Would you like reboot now? : YES
+> Would you like reboot now? : `YES`
 
 ## Bibliotheken
 
