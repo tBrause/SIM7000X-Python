@@ -2,7 +2,7 @@ import serial
 import time
 
 # Konfiguration für die serielle Schnittstelle
-SERIAL_PORT = "/dev/serial0"  # Anpassen, falls nötig
+SERIAL_PORT = "/pi/serial0"  # Anpassen, falls nötig
 BAUD_RATE = 9600
 TIMEOUT = 1
 

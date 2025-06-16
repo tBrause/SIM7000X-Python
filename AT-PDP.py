@@ -4,7 +4,7 @@ import serial
 import time
 
 # Konfiguriere die serielle Schnittstelle
-SERIAL_PORT = "/dev/serial0"
+SERIAL_PORT = "/pi/serial0"
 BAUD_RATE = 9600
 TIMEOUT = 1
 

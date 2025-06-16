@@ -79,7 +79,7 @@ chmod +x *.py
 ### Seriellen Port anpassen
 
 ```
-SERIAL_PORT = "/dev/virtual_serial0"
+SERIAL_PORT = "/pi/serial0"
 ```
 
 ---

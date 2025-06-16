@@ -1,7 +1,7 @@
 import serial
 import serial.tools.list_ports
 
-SERIAL_PORT = "/dev/serial0"
+SERIAL_PORT = "/pi/serial0"
 
 def is_port_in_use(port):
     """Prüft, ob der serielle Port bereits belegt ist."""
