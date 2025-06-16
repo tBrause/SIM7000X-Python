@@ -62,51 +62,6 @@ newgrp dialout
 sudo reboot
 ```
 
-## Autostart verhindern
-
-### Entferne: console=serial0,115200
-
-```
-sudo nano /boot/firmware/cmdline.txt
-```
-
-### Deaktiviere serial0
-
-```
-sudo systemctl disable serial-getty@serial0.service
-sudo systemctl stop serial-getty@serial0.service
-```
-
-```
-sudo reboot
-```
-
-## Serielle Ports mit socat in mehrere Instanzen aufteilen
-
-```
-sudo apt update
-```
-
-```
-sudo apt install socat
-```
-
-> SIM7000X HAT soll `/dev/virtual_serial0` nutzen
-
-```
-sudo socat -d -d pty,link=/dev/virtual_serial0,raw tcp:localhost:9000 &
-```
-
-```
-sudo systemctl unmask serial-getty@virtual_serial0.service
-sudo systemctl enable serial-getty@virtual_serial0.service
-sudo systemctl start serial-getty@virtual_serial0.service
-```
-
-```
-sudo reboot
-```
-
 ## Scripte
 
 ### Ausführbar machen
