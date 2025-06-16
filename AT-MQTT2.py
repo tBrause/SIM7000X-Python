@@ -35,9 +35,14 @@ def setup_mqtt(ser):
     
     response = send_at_command(ser, 'AT+CGDCONT=1,"IP","lpwa.vodafone.com"', "OK", timeout=5)
     print("Antwort:", response)
-    
+    if "ERROR" in response:
+        print("Fehler beim Setzen des PDP-Kontexts.")
+        return False
     response = send_at_command(ser, "AT+CMQTTSTATUS?", "OK", timeout=5)
     print("MQTT-Status:", response)
+    if "ERROR" in response:
+        print("MQTT-Status konnte nicht abgefragt werden.")
+        return False
     
     # 1. MQTT konfigurieren
     print("1. MQTT konfigurieren...")
