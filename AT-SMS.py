@@ -4,7 +4,7 @@ import serial
 import time
 
 # Konfiguration der seriellen Schnittstelle
-SERIAL_PORT = "/pi/serial0"  # Anpassen, falls anders
+SERIAL_PORT = "/dev/serial0"  # Anpassen, falls anders
 BAUD_RATE = 9600
 
 # Telefonnummer für den SMS-Versand

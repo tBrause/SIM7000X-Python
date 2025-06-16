@@ -11,7 +11,7 @@ def send_at_command(ser, command, expected_response, timeout=1):
     return response
 
 def main():
-    ser = serial.Serial('/pi/serial0', 9600, timeout=1)
+    ser = serial.Serial('/dev/serial0', 9600, timeout=1)
     
     try:
         send_at_command(ser, 'AT', 'OK')
