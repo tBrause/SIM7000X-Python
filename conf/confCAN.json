@@ -1,7 +1,0 @@
-{
-	"#Comment":"EnergyCAN configuration",
-	"STA_DLY":200,
-	"SDO_DLY":100,
-	"SDO_TO":400,
-	"MAX_CAP":1035300
-}
