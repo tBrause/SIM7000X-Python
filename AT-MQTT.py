@@ -5,7 +5,7 @@ import serial
 import time
 
 # Konfiguriere die serielle Schnittstelle
-SERIAL_PORT = "/pi/virtual_serial0"
+SERIAL_PORT = "/pi/serial0"
 BAUD_RATE = 9600
 TIMEOUT = 1
 
@@ -62,7 +62,7 @@ def main():
 
         # 2. Aktiviere MQTT
         print("\n# Aktiviere MQTT")
-        send_at_command(ser, f"AT+CGDCONT=1,'tcp://mqtt.c2.energywan.de:8083','internet'")
+        send_at_command(ser, f"AT+CGDCONT=1,'tcp://mqtt.c2.energywan.de:8883','internet'")
         send_at_command(ser, f"AT+CGATT=1")
         send_at_command(ser, f"AT+CMQTTACCQ=0,'client_id'")
         #send_at_command(ser, f"AT+SMCONF=?")
