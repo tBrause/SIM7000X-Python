@@ -44,6 +44,11 @@ def wait_for_ok(response, stepname):
 def main():
     print(f"Serielle Verbindung öffnen: {SERIAL_PORT} @ {BAUDRATE}")
     ser = serial.Serial(SERIAL_PORT, BAUDRATE, timeout=1)
+    
+    send_at(ser, "AT+CFUN=1,1", timeout=10)
+    print("Modul wird neu gestartet – bitte 30 Sekunden warten...")
+    time.sleep(30)
+
 
     # 1. Modul testen
     resp = send_at(ser, "AT")
