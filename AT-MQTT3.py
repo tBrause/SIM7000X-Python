@@ -40,8 +40,23 @@ def main():
 
     # 0. Reboot-Modul
     send_at(ser, "AT+CFUN=1,1", timeout=8)
-    print("Modul wird neu gestartet – bitte 25 Sekunden warten...")
-    time.sleep(25)
+    print("Modul wird neu gestartet – bitte 35 Sekunden warten...")
+    time.sleep(35)
+
+    def wait_for_modem_ready(ser, max_tries=20):
+        for i in range(max_tries):
+            resp = send_at(ser, "AT", timeout=1, show_cmd=False)
+            if "OK" in resp:
+                print(f"[OK] Modem antwortet nach {i+1} Versuchen.")
+                return True
+            else:
+                time.sleep(2)
+        print("[FEHLER] Modem antwortet nicht nach Reset.")
+        return False
+
+    if not wait_for_modem_ready(ser):
+        ser.close()
+        return
 
     # 1. Modul testen
     resp = send_at(ser, "AT")
