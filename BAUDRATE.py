@@ -1,3 +1,6 @@
+# import RPi.GPIO as GPIO
+import serial
+
 ports = ["/dev/serial0", "/dev/ttyS0", "/dev/ttyAMA0"]
 for port in ports:
     print(f"Teste Port: {port}")
