@@ -1,137 +1,148 @@
 import serial
 import time
 
-def send_at_command(ser, command, expected_response, timeout=5):
-    ser.write((command + "\r\n").encode())
-    time.sleep(0.5)
-    end_time = time.time() + timeout
-    response = ""
-    while time.time() < end_time:
-        if ser.in_waiting > 0:
-            response += ser.read(ser.in_waiting).decode()
-            if expected_response in response:
-                return response
-    return response
+# ==== KONFIGURATION ====
+SERIAL_PORT = "/dev/serial0"
+BAUDRATE = 115200
+APN = "lpwa.vodafone.com"
+MQTT_server = "emqx.c2.energywan.de"
+MQTT_port = 1883
+MQTT_user = "sww_ZL6xVtWQjN"
+MQTT_password = "sukFYfDzvrnsy8hD"
+MQTT_client = "TOMTEST01"
+MQTT_topic = "hello"
+MQTT_msg = "Hallo von SIM7000E!"
 
-# Serielle Verbindung einrichten
-serial_port = "/dev/serial0"
-baud_rate = 9600
+def send_at(ser, cmd, timeout=2, show_cmd=True):
+    if show_cmd:
+        print(f"--> {cmd.strip()}")
+    ser.write((cmd + '\r\n').encode())
+    time.sleep(timeout)
+    out = b""
+    while ser.in_waiting:
+        out += ser.read(ser.in_waiting)
+        time.sleep(0.1)
+    try:
+        decoded = out.decode(errors='ignore')
+        print(f"<-- {decoded.strip()}")
+        return decoded
+    except Exception as e:
+        print(f"Decode-Fehler: {e}")
+        return ""
 
-ser = serial.Serial(serial_port, baud_rate, timeout=1)
-print(f"Serielle Verbindung geöffnet: {serial_port} mit Baudrate {baud_rate}")
+def wait_for_ok(response, stepname):
+    if "OK" in response:
+        print(f"[OK] {stepname}")
+        return True
+    elif "ERROR" in response:
+        print(f"[FEHLER] {stepname}: ERROR")
+        return False
+    else:
+        print(f"[WARNUNG] {stepname}: Unerwartete Antwort")
+        return False
 
-try: 
+def main():
+    print(f"Serielle Verbindung öffnen: {SERIAL_PORT} @ {BAUDRATE}")
+    ser = serial.Serial(SERIAL_PORT, BAUDRATE, timeout=1)
 
-    # Netzwerkregistrierung überprüfen
-    print("Netzwerk-Status überprüfen...")
-    response = send_at_command(ser, "AT+CREG?", "+CREG: 0,1", timeout=5)
-    print("Netzwerk-Status:", response)
-    if "+CREG: 0,1" not in response:
-        print("Fehler: Modul nicht im Netzwerk registriert.")
-        exit()
+    # 1. Modul testen
+    resp = send_at(ser, "AT")
+    if not wait_for_ok(resp, "Modultest"):
+        ser.close()
+        return
 
-    # APN konfigurieren
-    print("APN konfigurieren...")
-    response = send_at_command(ser, 'AT+CGDCONT=1,"IP","internet"', "OK", timeout=5)
-    print("Antwort:", response)
-    
-    # Datenverbindung aktivieren
-    print("Datenverbindung aktivieren...")
-    response = send_at_command(ser, "AT+CGACT=1,1", "OK", timeout=5)
-    print("Datenverbindung aktiviert:", response)
-    if "OK" not in response:
-        print("Fehler: Datenverbindung konnte nicht aktiviert werden.")
-        exit()
+    # 2. APN für PDP-Kontext 1 setzen
+    resp = send_at(ser, f'AT+CGDCONT=1,"IP","{APN}"')
+    if not wait_for_ok(resp, "APN setzen"):
+        ser.close()
+        return
 
-    # TCP Verbindung aufbauen
-    print("TCP Verbindung aufbauen...")
-    response = send_at_command(ser, 'AT+CIPSTART="TCP","sanberlin.com","80"', "CONNECT OK", timeout=10)
-    print("TCP Verbindung aufgebaut:", response)
-    if "CONNECT OK" not in response:
-        print("Fehler: TCP Verbindung konnte nicht aufgebaut werden.")
-        exit()
+    # 3. Kontext 1 deaktivieren (sicherstellen, dass er sauber neu aufgebaut wird)
+    send_at(ser, "AT+CGACT=0,1")
+    time.sleep(2)
 
-    # Open wireless connection
-    print("Open wireless connection...")
-    response = send_at_command(ser, 'AT+CNACT=1,"internet"', "OK", timeout=5)
-    print("Wireless connection:", response)
-    
-    # local IP / AT+CNACT?
-    print("Lokale IP-Adresse abfragen...")
-    response = send_at_command(ser, "AT+CNACT?", "OK", timeout=5)
-    print("Lokale IP-Adresse:", response)
+    # 4. Kontext 1 aktivieren
+    resp = send_at(ser, "AT+CGACT=1,1", timeout=5)
+    if not wait_for_ok(resp, "PDP-Kontext aktivieren"):
+        ser.close()
+        return
 
+    # 5. IP-Adresse holen
+    time.sleep(2)
+    ipresp = send_at(ser, "AT+CGPADDR")
+    if "+CGPADDR: 1," not in ipresp or "0.0.0.0" in ipresp:
+        print("[FEHLER] Keine gültige IP-Adresse, MQTT-Stack kann nicht gestartet werden.")
+        ser.close()
+        return
 
+    # 6. MQTT-Stack starten
+    print("Starte MQTT-Stack...")
+    resp = send_at(ser, "AT+CMQTTSTART", timeout=5)
+    if "ERROR" in resp:
+        print("[FEHLER] MQTT-Stack konnte nicht gestartet werden.")
+        ser.close()
+        return
+    if "CMQTTSTART: 0" not in resp:
+        print("[WARNUNG] Unerwartete Antwort beim Start des MQTT-Stacks.")
 
-    # MQTT-Parameter konfigurieren
-    print("MQTT-Parameter konfigurieren...")
-    send_at_command(ser, 'AT+SMCONF="URL","emqx.c2.energywan.de","1883"', "OK", timeout=5)
-    send_at_command(ser, 'AT+SMCONF="CLIENTID","SIM7000X_Client_123"', "OK", timeout=5)
-    send_at_command(ser, 'AT+SMCONF="KEEPTIME",60', "OK", timeout=5)
-    send_at_command(ser, 'AT+SMCONF="CLEANSS",0', "OK", timeout=5)
-    send_at_command(ser, 'AT+SMCONF="QOS",0', "OK", timeout=5)
-    send_at_command(ser, 'AT+SMCONF="TOPIC","python/mqtt"', "OK", timeout=5)
-    send_at_command(ser, 'AT+SMCONF="MESSAGE","Hello"', "OK", timeout=5)
-    send_at_command(ser, 'AT+SMCONF="RETAIN",0', "OK", timeout=5)
-    send_at_command(ser, 'AT+SMCONF="USERNAME","your_username"', "OK", timeout=5)
-    send_at_command(ser, 'AT+SMCONF="PASSWORD","your_password"', "OK", timeout=5)
+    # 7. MQTT-Client anmelden
+    resp = send_at(ser, f'AT+CMQTTACCQ=0,"{MQTT_client}"')
+    if not wait_for_ok(resp, "MQTT-Client anmelden"):
+        send_at(ser, "AT+CMQTTSTOP")
+        ser.close()
+        return
 
-    # MQTT-Status überprüfen
-    print("MQTT-Dienst überprüfen...")
-    response = send_at_command(ser, 'AT+SMSTATE?', "OK", timeout=5)
-    print("Antwort:", response)
-    
-    if "+SMSTATE: 1" not in response:
-        print("Fehler: MQTT-Dienst ist nicht aktiv.")
-        
-    # Falls MQTT-Dienst nicht aktiv ist, manuell starten
-    if "+SMSTATE: 0" in response:
-      print("MQTT-Dienst ist nicht aktiv. Starte den Dienst...")
-    
-      response = send_at_command(ser, "AT+SMDISC", "OK", timeout=5)  # Falls vorher verbunden
-      print("MQTT-Reset:", response)
+    # 8. Mit MQTT-Broker verbinden
+    print("Verbinde mit MQTT-Broker...")
+    connect_cmd = f'AT+CMQTTCONNECT=0,"tcp://{MQTT_server}:{MQTT_port}",60,1,"{MQTT_user}","{MQTT_password}"'
+    resp = send_at(ser, connect_cmd, timeout=5)
+    if "OK" not in resp:
+        print("[FEHLER] Verbindung zum MQTT-Broker fehlgeschlagen.")
+        send_at(ser, "AT+CMQTTDISCONN=0")
+        send_at(ser, "AT+CMQTTSTOP")
+        ser.close()
+        return
 
-      response = send_at_command(ser, "AT+SMCONN", "OK", timeout=10)  # Versuche Verbindung erneut
-      print("MQTT-Verbindung:", response)
-    
-      response = send_at_command(ser, "AT+SMSTATE?", "OK", timeout=5)  # Status erneut prüfen
-      print("Neuer MQTT-Status:", response)
+    # 9. Topic senden
+    topic_len = len(MQTT_topic)
+    resp = send_at(ser, f'AT+CMQTTTOPIC=0,{topic_len}')
+    if ">" in resp:
+        ser.write(MQTT_topic.encode())
+        time.sleep(1)
+        print(f"<-- Topic gesendet: {MQTT_topic}")
+    else:
+        print("[FEHLER] Fehler bei MQTT-TOPIC.")
+        send_at(ser, "AT+CMQTTDISCONN=0")
+        send_at(ser, "AT+CMQTTSTOP")
+        ser.close()
+        return
 
-    if "+SMSTATE: 1" not in response:
-        print("Fehler: MQTT-Dienst konnte nicht aktiviert werden.")
-        exit()
+    # 10. Nachricht senden
+    msg_len = len(MQTT_msg)
+    resp = send_at(ser, f'AT+CMQTTMSG=0,{msg_len}')
+    if ">" in resp:
+        ser.write(MQTT_msg.encode())
+        time.sleep(1)
+        print(f"<-- Nachricht gesendet: {MQTT_msg}")
+    else:
+        print("[FEHLER] Fehler bei MQTT-MSG.")
+        send_at(ser, "AT+CMQTTDISCONN=0")
+        send_at(ser, "AT+CMQTTSTOP")
+        ser.close()
+        return
 
-    
-    # MQTT-Verbindung herstellen
-    print("MQTT-Verbindung herstellen...")
-    response = send_at_command(ser, "AT+SMCONN", "OK", timeout=20)  # Erhöhter Timeout
-    print("Antwort:", response)
-    time.sleep(3)  # Warte, um sicherzustellen, dass die Verbindung aufgebaut ist
-    if "ERROR" in response:
-        print("Fehler bei der MQTT-Verbindung.")
-        exit()
+    # 11. Publish
+    resp = send_at(ser, "AT+CMQTTPUB=0,1,60", timeout=3)
+    if "OK" in resp:
+        print("[OK] Nachricht veröffentlicht!")
+    else:
+        print("[FEHLER] Fehler beim Publish!")
 
-    # MQTT-Status erneut überprüfen
-    response = send_at_command(ser, "AT+SMSTATE?", "+SMSTATE: 1", timeout=5)
-    if "+SMSTATE: 1" not in response:
-        print("Fehler: MQTT ist nicht aktiv.")
-        exit()
-    
-    # Nachricht veröffentlichen
-    print("Nachricht veröffentlichen...")
-    response = send_at_command(ser, 'AT+SMPUB="python/mqtt",5,1,0', ">", timeout=5)
-    print("Antwort:", response)
-    if ">" in response:
-        ser.write("Hello\r\n".encode())  # Nachricht senden mit "\r\n"
-        time.sleep(0.5)
-
-    # MQTT-Verbindung trennen, aber nur wenn aktiv
-    if "+SMSTATE: 1" in send_at_command(ser, "AT+SMSTATE?", "+SMSTATE: 1", timeout=5):
-        print("MQTT-Verbindung trennen...")
-        response = send_at_command(ser, "AT+SMDISC", "OK", timeout=5)
-        print("Antwort:", response)
-
-finally:
-    # Serielle Verbindung schließen
+    # 12. Aufräumen
+    send_at(ser, "AT+CMQTTDISCONN=0")
+    send_at(ser, "AT+CMQTTSTOP")
     ser.close()
-    print("Serielle Verbindung geschlossen.")
+    print("Fertig, Verbindung geschlossen.")
+
+if __name__ == "__main__":
+    main()
