@@ -1,7 +1,7 @@
 import serial
 import time
 
-# ---- KONFIGURATION ----
+# Konfiguration
 SERIAL_PORT = "/dev/serial0"
 BAUDRATE = 115200
 APN = "lpwa.vodafone.com"
@@ -30,7 +30,7 @@ def send_at(ser, cmd, timeout=2, show_cmd=True):
     except Exception as e:
         print(f"Decode-Fehler: {e}")
         return ""
-    
+
 def wait_for_ok(response, stepname):
     if "OK" in response:
         print(f"[OK] {stepname}")
@@ -53,10 +53,19 @@ def main():
         return
 
     # APN setzen
-    resp = send_at(ser, 'AT+CGDCONT=1,"IP","lpwa.vodafone.com",,0,0,0,0')
+    resp = send_at(ser, f'AT+CGDCONT=1,"IP","{APN}"')
     if not wait_for_ok(resp, "APN setzen"):
         ser.close()
         return
+
+    # (Optional, kann helfen) Operator explizit setzen
+    resp = send_at(ser, 'AT+COPS=1,2,"26202"', timeout=10)
+    if not wait_for_ok(resp, "Operator setzen"):
+        print("[WARNUNG] Operator konnte nicht explizit gesetzt werden (evtl. bereits eingebucht)")
+
+    # Kontext ggf. zurücksetzen
+    send_at(ser, 'AT+CGACT=0,1')
+    time.sleep(2)
 
     # PDP-Kontext aktivieren
     resp = send_at(ser, "AT+CGACT=1,1", timeout=5)
@@ -64,18 +73,8 @@ def main():
         ser.close()
         return
 
-    # (Optional) GPRS aktivieren
-    #resp = send_at(ser, "AT+CIICR", timeout=20)
-    #if not wait_for_ok(resp, "GPRS Verbindung herstellen"):
-    #    ser.close()
-    #    return
-
-    # Status erneut prüfen
-    send_at(ser, "AT+CGACT?")
-    resp = send_at(ser, "AT+CGDCONT?")
-    resp = send_at(ser, "AT+CIFSR")    
-    
-    # Status-Check
+    # Warte 3 Sekunden, dann Status prüfen
+    time.sleep(3)
     print("\n== NETZWERKSTATUS CHECK ==\n")
     send_at(ser, "AT+CPIN?")
     send_at(ser, "AT+CSQ")
@@ -83,27 +82,29 @@ def main():
     send_at(ser, "AT+CGATT?")
     send_at(ser, "AT+CGACT?")
     send_at(ser, "AT+CGDCONT?")
+    # IP-Adresse per CGPADDR holen (funktioniert bei dir!)
+    ipresp = send_at(ser, "AT+CGPADDR")
     print("\n===========================\n")
 
-    # MQTT-Stack starten
+    if "0.0.0.0" in ipresp or "+CGPADDR:" not in ipresp:
+        print("[FEHLER] Keine gültige IP-Adresse. MQTT-Stack kann nicht gestartet werden.")
+        ser.close()
+        return
+
+    # --- MQTT-Stack starten ---
     print("Starte MQTT-Stack...")
-    resp = send_at(ser, "AT+CMQTTSTART", timeout=4)
+    resp = send_at(ser, "AT+CMQTTSTART", timeout=5)
     if "ERROR" in resp:
         print("MQTT-Stack konnte nicht gestartet werden.")
         ser.close()
         return
     if "CMQTTSTART: 0" not in resp:
         print("Achtung: Unerwartete Antwort beim Start des MQTT-Stacks.")
-        # Warte nochmal kurz und lese evtl. ausstehende Daten aus
-        time.sleep(3)
-        while ser.in_waiting:
-            print("<-- " + ser.read(ser.in_waiting).decode(errors='ignore').strip())
 
     # MQTT-Status prüfen
     resp = send_at(ser, "AT+CMQTTSTATUS?")
     if "ERROR" in resp:
         print("MQTT-Status konnte nicht abgefragt werden. Beende.")
-        # MQTT-Stack stoppen
         send_at(ser, "AT+CMQTTSTOP")
         ser.close()
         return
