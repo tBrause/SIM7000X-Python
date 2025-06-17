@@ -3,7 +3,7 @@ import time
 
 # Konfiguration für die serielle Schnittstelle
 SERIAL_PORT = "/dev/serial0"  # Anpassen, falls nötig
-BAUD_RATE = 9600
+BAUD_RATE = 115200
 TIMEOUT = 1
 
 # MQTT-Broker Konfiguration
