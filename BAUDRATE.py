@@ -1,28 +1,20 @@
 import serial
+import time
 
-SERIAL_PORT = "/dev/serial0"
-BAUD_RATE = 9600
+# Passe den Port ggf. an!
+port = "/dev/serial0"
 
-def is_port_in_use_and_correct_baudrate(port, baudrate):
-    """Prüft, ob der serielle Port frei ist und ob die Baudrate funktioniert."""
+for baud in [9600, 19200, 38400, 57600, 115200]:
+    print(f"Teste Baudrate: {baud}")
     try:
-        ser = serial.Serial(port, baudrate=baudrate, timeout=1)
-        ser.write(b'AT\r')  # Testbefehl senden (z. B. AT)
-        response = ser.read(64)  # Antwort lesen
-        ser.close()  # Sofort schließen
-        if response.strip():
-            return (False, True)  # Port ist frei und Baudrate passt
-        else:
-            return (False, False)  # Port ist frei, aber keine Antwort
-    except serial.SerialException:
-        return (True, False)  # Port ist belegt
-
-# Prüfen
-is_in_use, is_baudrate_correct = is_port_in_use_and_correct_baudrate(SERIAL_PORT, BAUD_RATE)
-
-if is_in_use:
-    print(f"Fehler: Der serielle Port {SERIAL_PORT} ist bereits belegt!")
-elif not is_baudrate_correct:
-    print(f"Fehler: Der serielle Port {SERIAL_PORT} ist frei, aber keine Antwort mit Baudrate {BAUD_RATE}.")
-else:
-    print(f"Der serielle Port {SERIAL_PORT} ist frei und die Baudrate {BAUD_RATE} funktioniert!")
+        ser = serial.Serial(port, baud, timeout=1)
+        ser.write(b'AT\r\n')
+        time.sleep(0.5)
+        resp = ser.read(100)
+        print(resp)
+        if b'OK' in resp:
+            print(f"Erfolg mit Baudrate {baud}")
+            break
+        ser.close()
+    except Exception as e:
+        print(e)
