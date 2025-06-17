@@ -1,17 +1,10 @@
 import serial
 import time
 
-# ==== KONFIGURATION ====
 SERIAL_PORT = "/dev/serial0"
 BAUDRATE = 115200
-APN = "lpwa.vodafone.com"
-MQTT_server = "emqx.c2.energywan.de"
-MQTT_port = 1883
-MQTT_user = "sww_ZL6xVtWQjN"
-MQTT_password = "sukFYfDzvrnsy8hD"
-MQTT_client = "TOMTEST01"
-MQTT_topic = "hello"
-MQTT_msg = "Hallo von SIM7000E!"
+APN = "lpwa.vodafone.com"   # Oder "internet"
+CONTEXT = 1                 # Oder 0 für Test
 
 def send_at(ser, cmd, timeout=2, show_cmd=True):
     if show_cmd:
@@ -44,11 +37,11 @@ def wait_for_ok(response, stepname):
 def main():
     print(f"Serielle Verbindung öffnen: {SERIAL_PORT} @ {BAUDRATE}")
     ser = serial.Serial(SERIAL_PORT, BAUDRATE, timeout=1)
-    
-    send_at(ser, "AT+CFUN=1,1", timeout=10)
-    print("Modul wird neu gestartet – bitte 30 Sekunden warten...")
-    time.sleep(30)
 
+    # 0. Reboot-Modul
+    send_at(ser, "AT+CFUN=1,1", timeout=8)
+    print("Modul wird neu gestartet – bitte 25 Sekunden warten...")
+    time.sleep(25)
 
     # 1. Modul testen
     resp = send_at(ser, "AT")
@@ -56,98 +49,28 @@ def main():
         ser.close()
         return
 
-    # 2. APN für PDP-Kontext 1 setzen
-    resp = send_at(ser, f'AT+CGDCONT=1,"IP","{APN}"')
+    # 2. APN für PDP-Kontext setzen
+    resp = send_at(ser, f'AT+CGDCONT={CONTEXT},"IP","{APN}"')
     if not wait_for_ok(resp, "APN setzen"):
         ser.close()
         return
 
-    # 3. Kontext 1 deaktivieren (sicherstellen, dass er sauber neu aufgebaut wird)
-    send_at(ser, "AT+CGACT=0,1")
-    time.sleep(2)
+    # 3. Kontext deaktivieren
+    send_at(ser, f"AT+CGACT=0,{CONTEXT}")
+    time.sleep(8)
 
-    # 4. Kontext 1 aktivieren
-    resp = send_at(ser, "AT+CGACT=1,1", timeout=5)
+    # Status abfragen
+    send_at(ser, f"AT+CGACT?")
+    send_at(ser, f"AT+CGDCONT?")
+    send_at(ser, f"AT+CGPADDR")
+
+    # 4. Kontext aktivieren
+    resp = send_at(ser, f"AT+CGACT=1,{CONTEXT}", timeout=6)
     if not wait_for_ok(resp, "PDP-Kontext aktivieren"):
         ser.close()
         return
 
-    # 5. IP-Adresse holen
-    time.sleep(2)
-    ipresp = send_at(ser, "AT+CGPADDR")
-    if "+CGPADDR: 1," not in ipresp or "0.0.0.0" in ipresp:
-        print("[FEHLER] Keine gültige IP-Adresse, MQTT-Stack kann nicht gestartet werden.")
-        ser.close()
-        return
-
-    # 6. MQTT-Stack starten
-    print("Starte MQTT-Stack...")
-    resp = send_at(ser, "AT+CMQTTSTART", timeout=5)
-    if "ERROR" in resp:
-        print("[FEHLER] MQTT-Stack konnte nicht gestartet werden.")
-        ser.close()
-        return
-    if "CMQTTSTART: 0" not in resp:
-        print("[WARNUNG] Unerwartete Antwort beim Start des MQTT-Stacks.")
-
-    # 7. MQTT-Client anmelden
-    resp = send_at(ser, f'AT+CMQTTACCQ=0,"{MQTT_client}"')
-    if not wait_for_ok(resp, "MQTT-Client anmelden"):
-        send_at(ser, "AT+CMQTTSTOP")
-        ser.close()
-        return
-
-    # 8. Mit MQTT-Broker verbinden
-    print("Verbinde mit MQTT-Broker...")
-    connect_cmd = f'AT+CMQTTCONNECT=0,"tcp://{MQTT_server}:{MQTT_port}",60,1,"{MQTT_user}","{MQTT_password}"'
-    resp = send_at(ser, connect_cmd, timeout=5)
-    if "OK" not in resp:
-        print("[FEHLER] Verbindung zum MQTT-Broker fehlgeschlagen.")
-        send_at(ser, "AT+CMQTTDISCONN=0")
-        send_at(ser, "AT+CMQTTSTOP")
-        ser.close()
-        return
-
-    # 9. Topic senden
-    topic_len = len(MQTT_topic)
-    resp = send_at(ser, f'AT+CMQTTTOPIC=0,{topic_len}')
-    if ">" in resp:
-        ser.write(MQTT_topic.encode())
-        time.sleep(1)
-        print(f"<-- Topic gesendet: {MQTT_topic}")
-    else:
-        print("[FEHLER] Fehler bei MQTT-TOPIC.")
-        send_at(ser, "AT+CMQTTDISCONN=0")
-        send_at(ser, "AT+CMQTTSTOP")
-        ser.close()
-        return
-
-    # 10. Nachricht senden
-    msg_len = len(MQTT_msg)
-    resp = send_at(ser, f'AT+CMQTTMSG=0,{msg_len}')
-    if ">" in resp:
-        ser.write(MQTT_msg.encode())
-        time.sleep(1)
-        print(f"<-- Nachricht gesendet: {MQTT_msg}")
-    else:
-        print("[FEHLER] Fehler bei MQTT-MSG.")
-        send_at(ser, "AT+CMQTTDISCONN=0")
-        send_at(ser, "AT+CMQTTSTOP")
-        ser.close()
-        return
-
-    # 11. Publish
-    resp = send_at(ser, "AT+CMQTTPUB=0,1,60", timeout=3)
-    if "OK" in resp:
-        print("[OK] Nachricht veröffentlicht!")
-    else:
-        print("[FEHLER] Fehler beim Publish!")
-
-    # 12. Aufräumen
-    send_at(ser, "AT+CMQTTDISCONN=0")
-    send_at(ser, "AT+CMQTTSTOP")
-    ser.close()
-    print("Fertig, Verbindung geschlossen.")
+    # Rest des Scripts wie gehabt...
 
 if __name__ == "__main__":
     main()
