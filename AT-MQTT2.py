@@ -58,6 +58,12 @@ def main():
         ser.close()
         return
 
+    # PDP-Kontext aktivieren
+    resp = send_at(ser, "AT+CGACT=1,1")
+    if not wait_for_ok(resp, "PDP-Kontext aktivieren"):
+        ser.close()
+        return
+    
     # Status-Check
     print("\n== NETZWERKSTATUS CHECK ==\n")
     send_at(ser, "AT+CPIN?")
