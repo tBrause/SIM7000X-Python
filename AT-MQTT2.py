@@ -1,145 +1,143 @@
 import serial
 import time
 
-# Konfiguration für die serielle Schnittstelle
-SERIAL_PORT = "/dev/serial0"  # Anpassen, falls nötig
-BAUD_RATE = 115200
-TIMEOUT = 1
+# ---- KONFIGURATION ----
+SERIAL_PORT = "/dev/serial0"
+BAUDRATE = 115200
+APN = "lpwa.vodafone.com"
 
-# MQTT-Broker Konfiguration
-BROKER = "mqtt.c2.energywan.de"
-PORT = "1883"
-CLIENT_ID = "TOMTEST01"
-TOPIC = "python/mqtt"
-MESSAGE = "Hello from SIM7000X!"
+MQTT_server = "emqx.c2.energywan.de"
+MQTT_port = 1883
+MQTT_user = "sww_ZL6xVtWQjN"
+MQTT_password = "sukFYfDzvrnsy8hD"
+MQTT_client = "TOMTEST01"
+MQTT_topic = "hello"
+MQTT_msg = "Hallo von SIM7000E!"
 
-def send_at_command(ser, command, expected_response, timeout=2):
-    """
-    Sendet einen AT-Befehl und wartet auf die erwartete Antwort.
-    """
-    ser.write((command + "\r\n").encode())  # Senden des Befehls
-    time.sleep(0.1)
-    start_time = time.time()
-    response = ""
-    while time.time() - start_time < timeout:
-        if ser.in_waiting > 0:
-            response += ser.read(ser.in_waiting).decode(errors="ignore")
-            if expected_response in response:
-                return response
-    return response  # Rückgabe der erhaltenen Antwort (auch wenn sie nicht passt)
-
-def setup_mqtt(ser):
-    """
-    Einrichtung der MQTT-Verbindung mit dem SIM7000-Modul.
-    """
+def send_at(ser, cmd, timeout=2, show_cmd=True):
+    if show_cmd:
+        print(f"--> {cmd.strip()}")
+    ser.write((cmd + '\r\n').encode())
+    time.sleep(timeout)
+    out = b""
+    while ser.in_waiting:
+        out += ser.read(ser.in_waiting)
+        time.sleep(0.1)
+    try:
+        decoded = out.decode(errors='ignore')
+        print(f"<-- {decoded.strip()}")
+        return decoded
+    except Exception as e:
+        print(f"Decode-Fehler: {e}")
+        return ""
     
-    response = send_at_command(ser, 'AT+CGDCONT=1,"IP","lpwa.vodafone.com"', "OK", timeout=5)
-    print("Antwort:", response)
-    if "ERROR" in response:
-        print("Fehler beim Setzen des PDP-Kontexts.")
+def wait_for_ok(response, stepname):
+    if "OK" in response:
+        print(f"[OK] {stepname}")
+        return True
+    elif "ERROR" in response:
+        print(f"[FEHLER] {stepname}: ERROR")
         return False
-    response = send_at_command(ser, "AT+CMQTTSTATUS?", "OK", timeout=5)
-    print("MQTT-Status:", response)
-    if "ERROR" in response:
-        print("MQTT-Status konnte nicht abgefragt werden.")
+    else:
+        print(f"[WARNUNG] {stepname}: Unerwartete Antwort")
         return False
-    
-    # 1. MQTT konfigurieren
-    print("1. MQTT konfigurieren...")
-    response = send_at_command(ser, f'AT+CMQTTSTART', "OK", timeout=5)
-    print("Antwort:", response)
-    if "ERROR" in response:
-        print("Fehler beim Starten des MQTT-Services.")
-        return False
-
-    # 2. MQTT-Client erstellen
-    print("2. MQTT-Client erstellen...")
-    response = send_at_command(ser, f'AT+CMQTTACCQ=0,"{CLIENT_ID}"', "OK", timeout=5)
-    print("Antwort:", response)
-    if "ERROR" in response:
-        print("Fehler beim Erstellen des MQTT-Clients.")
-        return False
-
-    # 3. Mit dem MQTT-Broker verbinden
-    print("3. Mit dem MQTT-Broker verbinden...")
-    response = send_at_command(ser, f'AT+CMQTTCONNECT=0,"tcp://{BROKER}:{PORT}",60,1', "+CMQTTCONNECT: 0,0", timeout=10)
-    print("Antwort:", response)
-    if "+CMQTTCONNECT: 0,0" not in response:
-        print("Fehler beim Verbinden mit dem MQTT-Broker.")
-        return False
-
-    return True
-
-def publish_message(ser):
-    """
-    Nachricht an den MQTT-Broker senden.
-    """
-    # 1. Länge der Nachricht bestimmen
-    print("1. Nachricht vorbereiten...")
-    message_length = len(MESSAGE)
-    response = send_at_command(ser, f'AT+CMQTTTOPIC=0,{len(TOPIC)}', ">", timeout=5)
-    print("Antwort:", response)
-    if ">" not in response:
-        print("Fehler beim Setzen des Topics.")
-        return False
-
-    # 2. Topic senden
-    ser.write((TOPIC + "\r\n").encode())
-    time.sleep(1)
-
-    # 3. Nachricht an das Topic senden
-    print("2. Nachricht senden...")
-    response = send_at_command(ser, f'AT+CMQTTPAYLOAD=0,{message_length}', ">", timeout=5)
-    print("Antwort:", response)
-    if ">" not in response:
-        print("Fehler beim Vorbereiten des Nachrichteninhalts.")
-        return False
-
-    # 4. Nachricht übertragen
-    ser.write((MESSAGE + "\r\n").encode())
-    time.sleep(1)
-
-    # 5. Nachricht veröffentlichen
-    print("3. Nachricht veröffentlichen...")
-    response = send_at_command(ser, 'AT+CMQTTPUB=0,1,60', "+CMQTTPUB: 0,0", timeout=5)
-    print("Antwort:", response)
-    if "+CMQTTPUB: 0,0" not in response:
-        print("Fehler beim Veröffentlichen der Nachricht.")
-        return False
-
-    print("Nachricht erfolgreich gesendet!")
-    return True
-
-def close_mqtt(ser):
-    """
-    MQTT-Verbindung schließen.
-    """
-    print("MQTT-Verbindung schließen...")
-    send_at_command(ser, "AT+CMQTTDISC=0,60", "+CMQTTDISC: 0,0", timeout=5)
-    send_at_command(ser, "AT+CMQTTREL=0", "OK", timeout=5)
-    send_at_command(ser, "AT+CMQTTSTOP", "OK", timeout=5)
-    print("MQTT-Service gestoppt.")
 
 def main():
-    try:
-        # Serielle Verbindung öffnen
-        ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=TIMEOUT)
-        print(f"Serielle Verbindung geöffnet: {SERIAL_PORT} mit Baudrate {BAUD_RATE}")
+    print(f"Serielle Verbindung öffnen: {SERIAL_PORT} @ {BAUDRATE}")
+    ser = serial.Serial(SERIAL_PORT, BAUDRATE, timeout=1)
 
-        # MQTT einrichten
-        if setup_mqtt(ser):
-            # Nachricht veröffentlichen
-            publish_message(ser)
-
-        # MQTT beenden
-        close_mqtt(ser)
-
-        # Serielle Verbindung schließen
+    # Modul testen
+    resp = send_at(ser, "AT")
+    if not wait_for_ok(resp, "Modultest"):
         ser.close()
-        print("Serielle Verbindung geschlossen.")
+        return
 
-    except Exception as e:
-        print(f"Fehler: {e}")
+    # APN setzen
+    resp = send_at(ser, f'AT+CGDCONT=1,"IP","{APN}"')
+    if not wait_for_ok(resp, "APN setzen"):
+        ser.close()
+        return
+
+    # MQTT-Stack starten
+    print("Starte MQTT-Stack...")
+    resp = send_at(ser, "AT+CMQTTSTART", timeout=4)
+    if "ERROR" in resp:
+        print("MQTT-Stack konnte nicht gestartet werden.")
+        ser.close()
+        return
+    if "CMQTTSTART: 0" not in resp:
+        print("Achtung: Unerwartete Antwort beim Start des MQTT-Stacks.")
+        # Warte nochmal kurz und lese evtl. ausstehende Daten aus
+        time.sleep(3)
+        while ser.in_waiting:
+            print("<-- " + ser.read(ser.in_waiting).decode(errors='ignore').strip())
+
+    # MQTT-Status prüfen
+    resp = send_at(ser, "AT+CMQTTSTATUS?")
+    if "ERROR" in resp:
+        print("MQTT-Status konnte nicht abgefragt werden. Beende.")
+        # MQTT-Stack stoppen
+        send_at(ser, "AT+CMQTTSTOP")
+        ser.close()
+        return
+
+    # MQTT Client anmelden
+    resp = send_at(ser, f'AT+CMQTTACCQ=0,"{MQTT_client}"')
+    if not wait_for_ok(resp, "MQTT-Client anmelden"):
+        send_at(ser, "AT+CMQTTSTOP")
+        ser.close()
+        return
+
+    # Mit Broker verbinden
+    print("Verbinde mit MQTT-Broker...")
+    connect_cmd = f'AT+CMQTTCONNECT=0,"tcp://{MQTT_server}:{MQTT_port}",60,1,"{MQTT_user}","{MQTT_password}"'
+    resp = send_at(ser, connect_cmd, timeout=5)
+    if "OK" not in resp:
+        print("Fehler bei der Verbindung zum MQTT-Broker.")
+        send_at(ser, "AT+CMQTTDISCONN=0")
+        send_at(ser, "AT+CMQTTSTOP")
+        ser.close()
+        return
+
+    # Publish vorbereiten
+    topic_len = len(MQTT_topic)
+    resp = send_at(ser, f'AT+CMQTTTOPIC=0,{topic_len}')
+    if ">" in resp:
+        ser.write(MQTT_topic.encode())
+        time.sleep(1)
+        print(f"<-- Topic gesendet: {MQTT_topic}")
+    else:
+        print("Fehler bei MQTT-TOPIC.")
+        send_at(ser, "AT+CMQTTDISCONN=0")
+        send_at(ser, "AT+CMQTTSTOP")
+        ser.close()
+        return
+
+    msg_len = len(MQTT_msg)
+    resp = send_at(ser, f'AT+CMQTTMSG=0,{msg_len}')
+    if ">" in resp:
+        ser.write(MQTT_msg.encode())
+        time.sleep(1)
+        print(f"<-- Nachricht gesendet: {MQTT_msg}")
+    else:
+        print("Fehler bei MQTT-MSG.")
+        send_at(ser, "AT+CMQTTDISCONN=0")
+        send_at(ser, "AT+CMQTTSTOP")
+        ser.close()
+        return
+
+    # Publish
+    resp = send_at(ser, "AT+CMQTTPUB=0,1,60", timeout=3)
+    if "OK" in resp:
+        print("[OK] Nachricht veröffentlicht!")
+    else:
+        print("Fehler beim Publish!")
+
+    # MQTT trennen und stoppen
+    send_at(ser, "AT+CMQTTDISCONN=0")
+    send_at(ser, "AT+CMQTTSTOP")
+    ser.close()
+    print("Fertig, Verbindung geschlossen.")
 
 if __name__ == "__main__":
     main()
