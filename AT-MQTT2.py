@@ -58,6 +58,16 @@ def main():
         ser.close()
         return
 
+    # Status-Check
+    print("\n== NETZWERKSTATUS CHECK ==\n")
+    send_at(ser, "AT+CPIN?")
+    send_at(ser, "AT+CSQ")
+    send_at(ser, "AT+COPS?")
+    send_at(ser, "AT+CGATT?")
+    send_at(ser, "AT+CGACT?")
+    send_at(ser, "AT+CGDCONT?")
+    print("\n===========================\n")
+
     # MQTT-Stack starten
     print("Starte MQTT-Stack...")
     resp = send_at(ser, "AT+CMQTTSTART", timeout=4)
