@@ -91,6 +91,20 @@ def main():
         ser.close()
         return
 
+    # AT+CGACT=0,1)
+    print("Starte MQTT-Stack...")
+    resp = send_at(ser, "AT+CGATT=0,1")
+    if not wait_for_ok(resp, "AT+CGATT=0,1"):
+        ser.close()
+        return
+    time.sleep(2)
+    
+    resp = send_at(ser, "AT+CGATT=1,1")
+    if not wait_for_ok(resp, "AT+CGATT=1,1"):
+        ser.close()
+        return
+    time.sleep(2)
+        
     # --- MQTT-Stack starten ---
     print("Starte MQTT-Stack...")
     resp = send_at(ser, "AT+CMQTTSTART", timeout=5)
