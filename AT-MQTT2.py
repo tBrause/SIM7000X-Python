@@ -53,7 +53,7 @@ def main():
         return
 
     # APN setzen
-    resp = send_at(ser, f'AT+CGDCONT=1,"IP","{APN}"')
+    resp = send_at(ser, 'AT+CGDCONT=1,"IP","lpwa.vodafone.com",,0,0,0,0')
     if not wait_for_ok(resp, "APN setzen"):
         ser.close()
         return
