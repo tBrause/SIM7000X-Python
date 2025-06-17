@@ -5,7 +5,7 @@ import time
 
 # Konfiguration der seriellen Schnittstelle
 SERIAL_PORT = "/dev/serial0"  # Anpassen, falls anders
-BAUD_RATE = 9600
+BAUD_RATE = 115200
 
 # Telefonnummer für den SMS-Versand
 PHONE_NUMBER = "+491784576321"  # Ersetze mit der echten Nummer
