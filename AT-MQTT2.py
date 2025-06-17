@@ -59,10 +59,21 @@ def main():
         return
 
     # PDP-Kontext aktivieren
-    resp = send_at(ser, "AT+CGACT=1,1")
+    resp = send_at(ser, "AT+CGACT=1,1", timeout=5)
     if not wait_for_ok(resp, "PDP-Kontext aktivieren"):
         ser.close()
         return
+
+    # (Optional) GPRS aktivieren
+    #resp = send_at(ser, "AT+CIICR", timeout=20)
+    #if not wait_for_ok(resp, "GPRS Verbindung herstellen"):
+    #    ser.close()
+    #    return
+
+    # Status erneut prüfen
+    send_at(ser, "AT+CGACT?")
+    resp = send_at(ser, "AT+CGDCONT?")
+    resp = send_at(ser, "AT+CIFSR")    
     
     # Status-Check
     print("\n== NETZWERKSTATUS CHECK ==\n")
