@@ -3,7 +3,7 @@ import time
 
 SERIAL_PORT = "/dev/serial0"
 BAUDRATE = 115200
-APN = "internet"
+APN = "lpwa.vodafone.com"
 MQTT_server = "emqx.c2.energywan.de"
 MQTT_port = 1883
 MQTT_user = "sww_ZL6xVtWQjN"
