@@ -1,154 +1,171 @@
-import sys
 import serial
 import time
-import os
-from datetime import datetime
 
-CMD_LINEBREAK = b'\r\n'
+SERIAL_PORT = "/dev/serial0"
+BAUDRATE = 115200
+APN = "lpwa.vodafone.com"
+MQTT_server = "emqx.c2.energywan.de"
+MQTT_port = 1883
+MQTT_user = "sww_ZL6xVtWQjN"
+MQTT_password = "sukFYfDzvrnsy8hD"
+MQTT_client = "TOMTEST01"
+MQTT_topic = "hello"
+MQTT_msg = "Hallo von SIM7000E!"
 
-PORT = "/dev/serial0"
-BAUD = 9600
+def send_at(ser, cmd, timeout=2, show_cmd=True):
+    if show_cmd:
+        print(f"--> {cmd.strip()}")
+    ser.write((cmd + '\r\n').encode())
+    time.sleep(timeout)
+    out = b""
+    while ser.in_waiting:
+        out += ser.read(ser.in_waiting)
+        time.sleep(0.1)
+    try:
+        decoded = out.decode(errors='ignore')
+        print(f"<-- {decoded.strip()}")
+        return decoded
+    except Exception as e:
+        print(f"Decode-Fehler: {e}")
+        return ""
 
-# Mosquitto.org Settings
-MQTT_URL="test.mosquitto.org"
-CERTS_FOLDER = 'certs'
-CA_NAME = 'mosquitto-ca.crt'
-CERT_NAME = "mosquitto.crt"
-KEY_NAME = "mosquitto.key"
+def wait_for_ok(response, stepname):
+    if "OK" in response:
+        print(f"[OK] {stepname}")
+        return True
+    elif "ERROR" in response:
+        print(f"[FEHLER] {stepname}: ERROR")
+        return False
+    else:
+        print(f"[WARNUNG] {stepname}: Unerwartete Antwort")
+        return False
 
-def send(data):
-    with serial.Serial(PORT, BAUD, timeout=1) as ser:
-        ser.write(data)
+def wait_for_ip(ser, tries=5, sleep=2):
+    for i in range(tries):
+        ipresp = send_at(ser, "AT+CGPADDR")
+        if "+CGPADDR: 1," in ipresp and "0.0.0.0" not in ipresp:
+            print(f"[OK] Echte IP nach {i+1} Versuchen: {ipresp.strip()}")
+            return True
+        time.sleep(sleep)
+    print("[FEHLER] Nach mehrfachem Versuch keine gültige IP – MQTT kann nicht gestartet werden.")
+    return False
 
-def send_cmd(cmd):
-    send(cmd.encode('utf-8') + CMD_LINEBREAK)
+def main():
+    print(f"Serielle Verbindung öffnen: {SERIAL_PORT} @ {BAUDRATE}")
+    ser = serial.Serial(SERIAL_PORT, BAUDRATE, timeout=1)
 
-def watch(timeout=10, success=None, failure=None, echo_cmd=None):
-    with serial.Serial(PORT, BAUD, timeout=1) as ser:
-        t_start = time.time()
-        reply = list()
-        while True:
-            if ser.in_waiting:
-                line = ser.readline()
-                echo = False
-                if echo_cmd:
-                    echo = line.decode('utf-8').strip().endswith(echo_cmd)
-                if line != CMD_LINEBREAK and not echo:
-                    line = line.decode('utf-8').strip()
-                    reply.append('\t' + line)
-                    if success and line.startswith(success):
-                        return ("Success", reply, time.time()-t_start)
-                    if failure and line.startswith(failure):
-                        return ("Error", reply, time.time()-t_start)
-            if (time.time()-t_start) > timeout:
-                return ("Timeout", reply, time.time()-t_start)
-            time.sleep(2)
+    # 1. Modul neu starten und warten, bis es antwortet
+    send_at(ser, "AT+CFUN=1,1", timeout=8)
+    print("Modul wird neu gestartet – bitte 35 Sekunden warten...")
+    time.sleep(35)
 
-def AT(cmd="", timeout=20, success="OK", failure="+CME ERROR"):
-    cmd = 'AT' + cmd
-    print("----------- ", cmd, " -----------")
-    send_cmd(cmd)
-    reply = watch(echo_cmd=cmd, timeout=timeout, success=success, failure=failure)
-    print("{0} ({1:.2f}secs):".format(reply[0], reply[2]))
-    print(*reply[1], sep='\n')
-    print('')
-    return reply
+    def wait_for_modem_ready(ser, max_tries=20):
+        for i in range(max_tries):
+            resp = send_at(ser, "AT", timeout=1, show_cmd=False)
+            if "OK" in resp:
+                print(f"[OK] Modem antwortet nach {i+1} Versuchen.")
+                return True
+            else:
+                time.sleep(2)
+        print("[FEHLER] Modem antwortet nicht nach Reset.")
+        return False
 
-# Restart board
-if "--reboot" in sys.argv:
-    AT('+CFUN=1,1', timeout=30, success="*PSUTTZ")
+    if not wait_for_modem_ready(ser):
+        ser.close()
+        return
 
-# AT('+CMNB=3') # Set preference for nb-iot (doesn't work with nb-iot)
-AT() # Check modem is responding
-AT("+CMEE=2") # Set debug level
-# Hardware Info
-AT("+CPIN?") # Check sim card is present and active
-AT("+CGMM") # Check module name
-AT("+CGMR") # Firmware version
-AT('+GSN') # Get IMEI number
-AT('+CCLK?') # Get system time
-# Signal info
-AT("+COPS?") # Check opertaor info
-AT("+CSQ") # Get signal strength
-AT('+CPSI?') # Get more detailed signal info
-AT('+CBAND?') # Get band
-# GPRS info
-AT("+CGREG?") # Get network registration status
-AT("+CGACT?") # Show PDP context state
-AT('+CGPADDR') # Show PDP address
-cgcontrdp = AT("+CGCONTRDP") # Get APN and IP address
-# Check nb-iot Status
-AT('+CGNAPN')
+    # 2. APN für PDP-Kontext 1 setzen
+    resp = send_at(ser, f'AT+CGDCONT=1,"IP","{APN}"')
+    if not wait_for_ok(resp, "APN setzen"):
+        ser.close()
+        return
 
-APN = cgcontrdp[1][0].split(",")[2]
-IP = cgcontrdp[1][0].split(",")[3]
+    # 3. Kontext 1 deaktivieren und Status checken
+    send_at(ser, "AT+CGACT=0,1")
+    time.sleep(7)
+    send_at(ser, "AT+CGACT?")
+    send_at(ser, "AT+CGDCONT?")
+    send_at(ser, "AT+CGPADDR")
 
+    # 4. Kontext 1 aktivieren
+    resp = send_at(ser, "AT+CGACT=1,1", timeout=5)
+    if not wait_for_ok(resp, "PDP-Kontext aktivieren"):
+        ser.close()
+        return
 
-# MQTT (No SSL) - Working :-)
-if sys.argv[1] == "mqtt-nossl":
-    print("++++++++++++++++++++ MQTT - NO SSL +++++++++++++++++++++\n")
-    AT("+CNACT=1") # Open wireless connection
-    AT("+CNACT?") # Check connection open and have IP
-    AT('+SMCONF="CLIENTID",SIM7000X_Client_1234')
-    AT('+SMCONF="KEEPTIME",60') # Set the MQTT connection time (timeout?)
-    AT('+SMCONF="CLEANSS",1')
-    AT('+SMCONF="URL","emqx.c2.energywan.de","1883"'.format(MQTT_URL)) # Set MQTT address
-    smstate = AT('+SMSTATE?') # Check MQTT connection state
-    if smstate[1][0].split(":")[1].strip() == "0":
-        AT('+SMCONN', timeout=30) # Connect to MQTT
-    msg = "Hello Moto {}".format(datetime.now())
-    AT('+SMPUB="test001","{}",1,1'.format(len(msg)), timeout=30, success=">") # Publish command
-    send(msg.encode('utf-8'))
-    watch(timeout=10)
-    #AT('+SMSUB="test1234",1')
-    AT('+SMDISC') # Disconnect MQTT
-    AT("+CNACT=0") # Close wireless connection
+    # 5. Auf echte IP warten
+    if not wait_for_ip(ser):
+        ser.close()
+        return
 
+    # --- MQTT-Ablauf ---
+    print("Starte MQTT-Stack...")
+    resp = send_at(ser, "AT+CMQTTSTART", timeout=5)
+    if "ERROR" in resp:
+        print("[FEHLER] MQTT-Stack konnte nicht gestartet werden.")
+        ser.close()
+        return
+    if "CMQTTSTART: 0" not in resp:
+        print("[WARNUNG] Unerwartete Antwort beim Start des MQTT-Stacks.")
 
-# MQTT (SSL) - No client cert, working for Mosquitto.org :-(
-if sys.argv[1] == "mqtt-cacert":
-    print("++++++++++++++++++++ MQTT - CA Cert Only +++++++++++++++++++++\n")
-    AT("+CNACT=1") # Open wireless connection
-    AT("+CNACT?") # Check connection open and have IP
-    AT('+SMCONF="CLIENTID", "TOMTEST01"')
-    AT('+SMCONF="KEEPTIME",60') # Set the MQTT connection time (timeout?)
-    AT('+SMCONF="CLEANSS",1')
-    AT('+SMCONF="URL","mqtts.emqx.c2.energywan.de","8883"'.format(MQTT_URL)) # Set MQTT address
-    AT('+CSSLCFG="ctxindex", 0') # Use index 1
-    AT('+CSSLCFG="sslversion",0,3') # TLS 1.2
-    AT('+CSSLCFG="convert",2,"{}"'.format(CA_NAME))
-    AT('+SMSSL=0, {}'.format(CA_NAME))
-    AT('+SMSSL?')
-    AT('+SMSTATE?') # Check MQTT connection state
-    AT('+SMCONN', timeout=60, success="OK") # Connect to MQTT
-    AT('+SMSTATE?', timeout=5) # Check MQTT connection state
-    msg = "Hello Moto {}".format(datetime.now())
-    AT('+SMPUB="test001","{}",1,1'.format(len(msg))) # Publish command
-    send(msg.encode('utf-8'))
-    #AT('+SMSUB="test1234",1')
-    AT('+SMDISC') # Connect to MQTT
+    # MQTT-Client anmelden
+    resp = send_at(ser, f'AT+CMQTTACCQ=0,"{MQTT_client}"')
+    if not wait_for_ok(resp, "MQTT-Client anmelden"):
+        send_at(ser, "AT+CMQTTSTOP")
+        ser.close()
+        return
 
-# MQTT (SSL) - CA and client certs, working for Mosquitto.org :-(
-if sys.argv[1] == "mqtt-bothcerts":
-    print("++++++++++++++++++++ MQTT - CA and Client Cert +++++++++++++++++++++\n")
-    AT("+CNACT=1") # Open wireless connection
-    AT("+CNACT?") # Check connection open and have IP
-    AT('+SMCONF="CLIENTID", "TOMTEST01"')
-    AT('+SMCONF="KEEPTIME",60') # Set the MQTT connection time (timeout?)
-    AT('+SMCONF="CLEANSS",1')
-    AT('+SMCONF="URL","{}","8884"'.format(MQTT_URL)) # Set MQTT address
-    AT('+CSSLCFG="ctxindex", 0') # Use index 1
-    AT('+CSSLCFG="sslversion",0,3') # TLS 1.2
-    AT('+CSSLCFG="convert",2,"{}"'.format(CA_NAME))
-    AT('+CSSLCFG="convert",1,"{}","{}"'.format(CERT_NAME, KEY_NAME))
-    AT('+SMSSL=1, {}, {}'.format(CA_NAME, CERT_NAME))
-    AT('+SMSSL?')
-    AT('+SMSTATE?') # Check MQTT connection state
-    AT('+SMCONN', timeout=60, success="OK") # Connect to MQTT, this can take a while
-    AT('+SMSTATE?', timeout=5) # Check MQTT connection state
-    msg = "Hello Moto {}".format(datetime.now())
-    AT('+SMPUB="test001","{}",1,1'.format(len(msg)), success=">") # Publish command
-    send(msg.encode('utf-8'))
-    watch(timeout=10)
-    #AT('+SMSUB="test1234",1')
-    AT('+SMDISC') # Connect to MQTT
+    # Mit MQTT-Broker verbinden
+    print("Verbinde mit MQTT-Broker...")
+    connect_cmd = f'AT+CMQTTCONNECT=0,"tcp://{MQTT_server}:{MQTT_port}",60,1,"{MQTT_user}","{MQTT_password}"'
+    resp = send_at(ser, connect_cmd, timeout=5)
+    if "OK" not in resp:
+        print("[FEHLER] Verbindung zum MQTT-Broker fehlgeschlagen.")
+        send_at(ser, "AT+CMQTTDISCONN=0")
+        send_at(ser, "AT+CMQTTSTOP")
+        ser.close()
+        return
+
+    # Topic senden
+    topic_len = len(MQTT_topic)
+    resp = send_at(ser, f'AT+CMQTTTOPIC=0,{topic_len}')
+    if ">" in resp:
+        ser.write(MQTT_topic.encode())
+        time.sleep(1)
+        print(f"<-- Topic gesendet: {MQTT_topic}")
+    else:
+        print("[FEHLER] Fehler bei MQTT-TOPIC.")
+        send_at(ser, "AT+CMQTTDISCONN=0")
+        send_at(ser, "AT+CMQTTSTOP")
+        ser.close()
+        return
+
+    # Nachricht senden
+    msg_len = len(MQTT_msg)
+    resp = send_at(ser, f'AT+CMQTTMSG=0,{msg_len}')
+    if ">" in resp:
+        ser.write(MQTT_msg.encode())
+        time.sleep(1)
+        print(f"<-- Nachricht gesendet: {MQTT_msg}")
+    else:
+        print("[FEHLER] Fehler bei MQTT-MSG.")
+        send_at(ser, "AT+CMQTTDISCONN=0")
+        send_at(ser, "AT+CMQTTSTOP")
+        ser.close()
+        return
+
+    # Publish
+    resp = send_at(ser, "AT+CMQTTPUB=0,1,60", timeout=3)
+    if "OK" in resp:
+        print("[OK] Nachricht veröffentlicht!")
+    else:
+        print("[FEHLER] Fehler beim Publish!")
+
+    # Aufräumen
+    send_at(ser, "AT+CMQTTDISCONN=0")
+    send_at(ser, "AT+CMQTTSTOP")
+    ser.close()
+    print("Fertig, Verbindung geschlossen.")
+
+if __name__ == "__main__":
+    main()
