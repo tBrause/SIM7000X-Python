@@ -11,7 +11,8 @@ def at(cmd, t=1):
 at("AT")
 at('AT+CGDCONT=1,"IP","lpwa.vodafone.com"')
 # keine Kontext-Bausteine, wie in deinem funktionierenden Code
-at('AT+SMCONF="URL","tcp://emqx.c2.energywan.de:1883"')
+#at('AT+SMCONF="URL","tcp://emqx.c2.energywan.de:1883"')
+at('AT+SMCONF="URL","tcp://test.mosquitto.org:1883"')
 at(f'AT+SMCONF="USERNAME","sww_ZL6xVtWQjN"')
 at(f'AT+SMCONF="PASSWORD","sukFYfDzvrnsy8hD"')
 at(f'AT+SMCONF="CLIENTID","TOMTEST01"')
