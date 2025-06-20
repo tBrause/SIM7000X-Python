@@ -74,6 +74,14 @@ def main():
         ser.close()
         return
 
+    send_at(ser, 'AT+CNMP=38')  # LTE Only
+    send_at(ser, 'AT+CMNB=3')   # Cat-M1 only
+    time.sleep(2)
+
+    send_at(ser, "ATI")
+    send_at(ser, "AT+CMQTTVER")
+
+    
     # 2. APN für PDP-Kontext 1 setzen
     resp = send_at(ser, f'AT+CGDCONT=1,"IP","{APN}"')
     if not wait_for_ok(resp, "APN setzen"):
