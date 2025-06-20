@@ -80,6 +80,11 @@ def main():
         ser.close()
         return
 
+    # 2b. Operator auf Vodafone NB-IoT zwingen (OPS 26202)
+    resp = send_at(ser, 'AT+COPS=1,2,"26202"', timeout=20)
+    if not wait_for_ok(resp, "Operator setzen"):
+        print("[WARNUNG] Operator konnte nicht explizit gesetzt werden (evtl. bereits eingebucht)")
+
     # 3. Kontext 1 deaktivieren und Status checken
     send_at(ser, "AT+CGACT=0,1")
     time.sleep(7)
