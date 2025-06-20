@@ -84,6 +84,23 @@ def main():
     if not wait_for_ok(resp, "PDP-Kontext aktivieren"):
         ser.close()
         return
+    # Nach Aktivierung kurz warten und nochmal Status checken
+    time.sleep(3)
+    send_at(ser, "AT+CGACT?")
+    send_at(ser, "AT+CGDCONT?")
+    ipresp = send_at(ser, "AT+CGPADDR")
+
+    for i in range(5):
+        ipresp = send_at(ser, "AT+CGPADDR")
+        if "+CGPADDR: 1," in ipresp and "0.0.0.0" not in ipresp:
+            print(f"[OK] Echte IP nach {i+1} Versuchen: {ipresp.strip()}")
+            break
+        time.sleep(2)
+    else:
+        print("[FEHLER] Nach mehrfachem Versuch keine gültige IP – MQTT kann nicht gestartet werden.")
+        ser.close()
+        return
+
 
     # Rest des Scripts wie gehabt...
 
