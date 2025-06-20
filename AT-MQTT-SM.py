@@ -15,10 +15,21 @@ at('AT+SMCONF="URL","tcp://emqx.c2.energywan.de:1883"')
 at(f'AT+SMCONF="USERNAME","sww_ZL6xVtWQjN"')
 at(f'AT+SMCONF="PASSWORD","sukFYfDzvrnsy8hD"')
 at(f'AT+SMCONF="CLIENTID","TOMTEST01"')
+at("AT+CGPADDR")
+at("AT+CGPSTATUS")
+
 at("AT+SMCONN")
 time.sleep(2)
+
+at("AT+SMSTATE?")
+at("AT+SMSTAT?")
+
 at(f'AT+SMPUB="hello",0,60')
 # ggf. Daten payload direkt danach
 time.sleep(1)
 at("AT+SMDISC")
+time.sleep(1)
+at('AT+SMSTATE?')
+at('AT+SMSTAT?')
+at('AT+SMERROR?')
 ser.close()
